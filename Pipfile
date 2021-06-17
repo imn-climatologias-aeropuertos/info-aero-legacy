@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+version = "2.0.0"
+description = "Simple GUI for creating aeronautical-meteorological report from MRPV"
+
+[packages]
+pillow = "*"
+
+[dev-packages]
+isort = "*"
+black = "==21.6b0"
+bump2version = "*"
+
+[requires]
+python_version = "3.6"
