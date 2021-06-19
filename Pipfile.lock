@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "155b98fcca4b7c6a19c36d646bceba99f0ec33f7aba7b4eb032aeaad343234d5"
+            "sha256": "e056447fb15ac6d170fe8f92cb9715cfec472de8c8d09ee4e17aed3b202fa74a"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -9,13 +9,22 @@
         },
         "sources": [
             {
+                "description": "Simple GUI for creating aeronautical-meteorological report from MRPV",
                 "name": "pypi",
                 "url": "https://pypi.org/simple",
-                "verify_ssl": true
+                "verify_ssl": true,
+                "version": "2.0.0"
             }
         ]
     },
     "default": {
+        "docx2txt": {
+            "hashes": [
+                "sha256:2c06d98d7cfe2d3947e5760a57d924e3ff07745b379c8737723922e7009236e5"
+            ],
+            "index": "pypi",
+            "version": "==0.8"
+        },
         "pillow": {
             "hashes": [
                 "sha256:01425106e4e8cee195a411f729cff2a7d61813b0b11737c12bd5991f5f14bcd5",

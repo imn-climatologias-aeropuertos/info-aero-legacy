@@ -3,6 +3,7 @@ import tkinter as tk
 from .__colors__ import light_blue, white
 from .__version__ import version
 from .frames import Header
+from .utils import extract
 
 
 class App(tk.Tk):
@@ -22,6 +23,15 @@ class App(tk.Tk):
 
         # Crete all frames
         self.header = Header(master=self, width=self.win_width, height=110)
+
+        self.extract_btn = tk.Button(
+            self, text="Extraer", fg=white, bg=light_blue, command=self.extract_images
+        )
+        self.extract_btn.pack()
+
+    def extract_images(self):
+        for docx in self.header.docx_files:
+            extract(docx)
 
     def set_window_size_and_position(self):
         screen_width = self.winfo_screenwidth()
