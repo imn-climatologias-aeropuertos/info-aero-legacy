@@ -5,8 +5,6 @@ from PIL import Image, ImageTk
 
 from ..__colors__ import light_blue, white
 
-# TODO: Crear un método para extraer las imágenes desde los avisos de ceniza
-
 
 class Header(Frame):
     def __init__(self, master=None, width=100, height=100):
