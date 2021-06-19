@@ -2,7 +2,7 @@ import tkinter as tk
 
 from .__colors__ import light_blue, white
 from .__version__ import version
-from .frames.header import Header
+from .frames import Header
 
 
 class App(tk.Tk):
