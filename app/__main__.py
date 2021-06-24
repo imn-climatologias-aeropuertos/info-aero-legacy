@@ -2,7 +2,7 @@ import tkinter as tk
 
 from .__colors__ import light_blue, white
 from .__version__ import version
-from .frames import Header, Climatology
+from .frames import Climatology, Header, SelectUser
 from .utils import extract
 
 
@@ -28,8 +28,15 @@ class App(tk.Tk):
         #     self, text="Extraer", fg=white, bg=light_blue, command=self.extract_images
         # )
         # self.extract_btn.pack()
-        
+
         self.clima = Climatology(master=self, width=self.win_width)
+
+        self.select_user = SelectUser(master=self, width=self.win_width)
+    
+        tk.Button(text="Get values", command=self.print_user).pack()
+    
+    def print_user(self):
+        print(self.select_user.get_user())
 
     def extract_images(self):
         for docx in self.header.docx_files:
