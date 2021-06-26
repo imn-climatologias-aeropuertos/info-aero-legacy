@@ -41,6 +41,11 @@ class App(tk.Tk):
     def extract_images(self):
         for docx in self.header.docx_files:
             extract(docx)
+    
+    def set_font_size(self):
+        self.big_font = round(self.win_width * 0.02)
+        self.small_font = round(self.win_width * 0.015)
+        print(self.big_font, self.small_font)
 
     def set_window_size_and_position(self):
         screen_width = self.winfo_screenwidth()
@@ -48,10 +53,14 @@ class App(tk.Tk):
 
         self.win_width = round(screen_width * 0.40)
         self.win_height = round(screen_height * 0.80)
+        print(self.win_width, self.win_height)
         self.x_position = screen_width // 2 - self.win_width // 2
         self.y_position = (
             screen_height // 2 - self.win_height // 2 - round(screen_height * 0.03)
         )
+        
+        # set the font sizes
+        self.set_font_size()
 
 
 if __name__ == "__main__":
