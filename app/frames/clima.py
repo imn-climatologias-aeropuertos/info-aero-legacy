@@ -51,7 +51,7 @@ class Station(Frame):
             bd=3,
             width=5,
             fg=blue,
-            #relief="flat",
+            # relief="flat",
             justify="center",
         )
         entry.grid(row=self._row, column=column)
@@ -62,7 +62,15 @@ class Station(Frame):
 
 
 class Climatology(Frame):
-    def __init__(self, master=None, width=100, height=100, font_type="Verdana", big_font=16, small_font=14):
+    def __init__(
+        self,
+        master=None,
+        width=100,
+        height=100,
+        font_type="Verdana",
+        big_font=16,
+        small_font=14,
+    ):
         super().__init__(master)
         self.master = master
         self.width = width

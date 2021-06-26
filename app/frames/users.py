@@ -19,7 +19,9 @@ USERS = [
 
 
 class OtherUser(Frame):
-    def __init__(self, master=None, width=250, height=100, font_type="Verdana", font_size=10):
+    def __init__(
+        self, master=None, width=250, height=100, font_type="Verdana", font_size=10
+    ):
         super().__init__(master)
         self.width = width
         self.height = height
@@ -33,11 +35,21 @@ class OtherUser(Frame):
 
     def _create(self):
         self.name_label = Label(
-            self, text="Nombre", fg=blue, bg=white, font=(self.font_type, self.font_size), padx=5
+            self,
+            text="Nombre",
+            fg=blue,
+            bg=white,
+            font=(self.font_type, self.font_size),
+            padx=5,
         )
         self.name_label.grid(row=0, column=0)
         self.email_label = Label(
-            self, text="Email", fg=blue, bg=white, font=(self.font_type, self.font_size), padx=5
+            self,
+            text="Email",
+            fg=blue,
+            bg=white,
+            font=(self.font_type, self.font_size),
+            padx=5,
         )
         self.email_label.grid(row=1, column=0)
         self.name_entry = Entry(
@@ -54,7 +66,15 @@ class OtherUser(Frame):
 
 
 class SelectUser(Frame):
-    def __init__(self, master=None, width=100, height=100, font_type="Verdana", big_font=16, small_font=14):
+    def __init__(
+        self,
+        master=None,
+        width=100,
+        height=100,
+        font_type="Verdana",
+        big_font=16,
+        small_font=14,
+    ):
         super().__init__(master)
         self.width = width
         self.height = height
@@ -114,10 +134,10 @@ class SelectUser(Frame):
             )
             rbtn.grid(row=row, column=column)
             column += 1
-    
+
     def get_user(self):
         user_index = int(self.rbtn_value.get())
         if self.rbtn_value.get() in "0123":
             return USERS[user_index]
-        
+
         return User(*self.other_user.get_values(), "4")

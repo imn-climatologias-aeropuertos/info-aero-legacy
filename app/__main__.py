@@ -33,19 +33,29 @@ class App(tk.Tk):
         # )
         # self.extract_btn.pack()
 
-        self.clima = Climatology(master=self, width=self.win_width, big_font=self.big_font, small_font=self.small_font)
+        self.clima = Climatology(
+            master=self,
+            width=self.win_width,
+            big_font=self.big_font,
+            small_font=self.small_font,
+        )
 
-        self.select_user = SelectUser(master=self, width=self.win_width, big_font=self.big_font, small_font=self.small_font)
-    
+        self.select_user = SelectUser(
+            master=self,
+            width=self.win_width,
+            big_font=self.big_font,
+            small_font=self.small_font,
+        )
+
         tk.Button(text="Get values", command=self.print_user).pack()
-    
+
     def print_user(self):
         print(self.select_user.get_user())
 
     def extract_images(self):
         for docx in self.header.docx_files:
             extract(docx)
-    
+
     def set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
         self.small_font = round(self.win_width * 0.022)
@@ -62,7 +72,7 @@ class App(tk.Tk):
         self.y_position = (
             screen_height // 2 - self.win_height // 2 - round(screen_height * 0.03)
         )
-        
+
         # set the font sizes
         self.set_font_size()
 
