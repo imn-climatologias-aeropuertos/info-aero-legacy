@@ -1,4 +1,5 @@
 import tkinter as tk
+from platform import system
 
 from .__colors__ import light_blue, white
 from .__version__ import version
@@ -18,8 +19,11 @@ class App(tk.Tk):
         self.config(bg=white)
 
         # Set the app icon
-        icon = tk.PhotoImage(file="./app/assets/icons/plane.png")
-        self.tk.call("wm", "iconphoto", self._w, icon)
+        if system() == "Windows":
+            self.iconbitmap("./app/assets/icons/plane.ico")
+        else:
+            icon = tk.PhotoImage(file="./app/assets/icons/plane.png")
+            self.tk.call("wm", "iconphoto", self._w, icon)
 
         # Crete all frames
         self.header = Header(master=self, width=self.win_width, height=110)
@@ -29,9 +33,9 @@ class App(tk.Tk):
         # )
         # self.extract_btn.pack()
 
-        self.clima = Climatology(master=self, width=self.win_width)
+        self.clima = Climatology(master=self, width=self.win_width, big_font=self.big_font, small_font=self.small_font)
 
-        self.select_user = SelectUser(master=self, width=self.win_width)
+        self.select_user = SelectUser(master=self, width=self.win_width, big_font=self.big_font, small_font=self.small_font)
     
         tk.Button(text="Get values", command=self.print_user).pack()
     
@@ -43,8 +47,8 @@ class App(tk.Tk):
             extract(docx)
     
     def set_font_size(self):
-        self.big_font = round(self.win_width * 0.02)
-        self.small_font = round(self.win_width * 0.015)
+        self.big_font = round(self.win_width * 0.035)
+        self.small_font = round(self.win_width * 0.022)
         print(self.big_font, self.small_font)
 
     def set_window_size_and_position(self):
@@ -52,7 +56,7 @@ class App(tk.Tk):
         screen_height = self.winfo_screenheight()
 
         self.win_width = round(screen_width * 0.40)
-        self.win_height = round(screen_height * 0.80)
+        self.win_height = round(screen_height * 0.84)
         print(self.win_width, self.win_height)
         self.x_position = screen_width // 2 - self.win_width // 2
         self.y_position = (

@@ -81,7 +81,7 @@ class Climatology(Frame):
             text="CLIMATOLOGÍA DE LOS AEROPUERTOS",
             fg=blue,
             bg=white,
-            font=(self.font_type, self.big_font + 2),
+            font=(self.font_type, self.big_font),
             pady=self._pady,
         )
         self.title.pack()
@@ -147,7 +147,7 @@ class Climatology(Frame):
             text=text,
             fg=light_blue,
             bg=white,
-            font=(self.font_type, 14),
+            font=(self.font_type, self.small_font),
             padx=self._padx,
         )
         lb.grid(row=row, column=column)
