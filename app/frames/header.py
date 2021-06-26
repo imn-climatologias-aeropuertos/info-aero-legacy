@@ -76,8 +76,6 @@ class Header(Frame):
             filetypes=filetypes,
         )
 
-        print(self.docx_files)
-
     def _create_buttons(self):
         __frame = Frame(self, bg=white)
 

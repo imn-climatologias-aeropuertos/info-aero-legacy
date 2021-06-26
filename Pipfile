@@ -8,6 +8,7 @@ description = "Simple GUI for creating aeronautical-meteorological report from M
 [packages]
 pillow = "*"
 docx2txt = "*"
+suntime = "*"
 
 [dev-packages]
 isort = "*"

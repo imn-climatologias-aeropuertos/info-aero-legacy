@@ -3,7 +3,7 @@ from platform import system
 
 from .__colors__ import light_blue, white
 from .__version__ import version
-from .frames import Climatology, Header, SelectUser
+from .frames import Climatology, Ephemeris, Header, SelectUser
 from .utils import extract
 
 
@@ -47,10 +47,12 @@ class App(tk.Tk):
             small_font=self.small_font,
         )
 
+        self.ephemeris = Ephemeris(master=self)
+
         tk.Button(text="Get values", command=self.print_user).pack()
 
     def print_user(self):
-        print(self.select_user.get_user())
+        print("Hora efemérides", self.ephemeris.get_ephmeris_time())
 
     def extract_images(self):
         for docx in self.header.docx_files:
@@ -59,7 +61,6 @@ class App(tk.Tk):
     def set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
         self.small_font = round(self.win_width * 0.022)
-        print(self.big_font, self.small_font)
 
     def set_window_size_and_position(self):
         screen_width = self.winfo_screenwidth()
@@ -67,7 +68,6 @@ class App(tk.Tk):
 
         self.win_width = round(screen_width * 0.40)
         self.win_height = round(screen_height * 0.84)
-        print(self.win_width, self.win_height)
         self.x_position = screen_width // 2 - self.win_width // 2
         self.y_position = (
             screen_height // 2 - self.win_height // 2 - round(screen_height * 0.03)

@@ -88,7 +88,6 @@ class SelectUser(Frame):
 
         # Radio buttons sentinel variable
         self.rbtn_value = StringVar(self, "4")
-        print(self.rbtn_value.get())
 
         # Section title
         self.title = Label(
