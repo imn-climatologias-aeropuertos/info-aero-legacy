@@ -12,6 +12,7 @@ class Station(Frame):
         width=100,
         height=10,
         font_type="Verdana",
+        font_size=10,
         padx=8,
         pady=0,
     ):
@@ -19,6 +20,7 @@ class Station(Frame):
         self.master = master
         self.name = name
         self.font_type = font_type
+        self.font_size = font_size
         self.width = width
         self.height = height
         self._row = row
@@ -34,7 +36,7 @@ class Station(Frame):
             text=self.name.upper(),
             fg=light_blue,
             bg=white,
-            font=(self.font_type, 14),
+            font=(self.font_type, self.font_size),
             padx=self._padx,
             pady=self._pady,
         ).grid(row=self._row, column=0)
@@ -49,7 +51,7 @@ class Station(Frame):
             bd=3,
             width=5,
             fg=blue,
-            relief="flat",
+            #relief="flat",
             justify="center",
         )
         entry.grid(row=self._row, column=column)
@@ -60,12 +62,14 @@ class Station(Frame):
 
 
 class Climatology(Frame):
-    def __init__(self, master=None, width=100, height=100, font_type="Verdana"):
+    def __init__(self, master=None, width=100, height=100, font_type="Verdana", big_font=16, small_font=14):
         super().__init__(master)
         self.master = master
         self.width = width
         self.height = height
         self.font_type = font_type
+        self.big_font = big_font
+        self.small_font = small_font
         self._pady = 6
         self._padx = 8
         self.config(bg=white, width=self.width, height=self.height)
@@ -77,7 +81,7 @@ class Climatology(Frame):
             text="CLIMATOLOGÍA DE LOS AEROPUERTOS",
             fg=blue,
             bg=white,
-            font=(self.font_type, 18),
+            font=(self.font_type, self.big_font + 2),
             pady=self._pady,
         )
         self.title.pack()
@@ -97,6 +101,7 @@ class Climatology(Frame):
                 name="mroc",
                 width=self.width,
                 font_type=self.font_type,
+                font_size=self.small_font,
                 padx=self._padx,
                 pady=self._pady,
             ),
@@ -106,6 +111,7 @@ class Climatology(Frame):
                 name="mrpv",
                 width=self.width,
                 font_type=self.font_type,
+                font_size=self.small_font,
                 padx=self._padx,
             ),
             Station(
@@ -114,6 +120,7 @@ class Climatology(Frame):
                 name="mrlb",
                 width=self.width,
                 font_type=self.font_type,
+                font_size=self.small_font,
                 padx=self._padx,
                 pady=self._pady,
             ),
@@ -123,6 +130,7 @@ class Climatology(Frame):
                 name="mrlm",
                 width=self.width,
                 font_type=self.font_type,
+                font_size=self.small_font,
                 padx=self._padx,
             ),
         ]
