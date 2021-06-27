@@ -11,7 +11,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title(f"AeroInformes - {version}")
-        self.set_window_size_and_position()
+        self._set_window_size_and_position()
         self.geometry(
             f"{self.win_width}x{self.win_height}+{self.x_position}+{self.y_position}"
         )
@@ -56,17 +56,17 @@ class App(tk.Tk):
         tk.Button(self, text="Salir", relief="flat", fg=white, bg=light_blue, command=self.destroy).pack()
 
     def print_user(self):
-        print("Hora efemérides", self.ephemeris.get_ephmeris_time())
+        print("Hora efemérides", self.ephemeris.get_ephemeris_time())
 
-    def extract_images(self):
+    def _extract_images(self):
         for docx in self.header.docx_files:
             extract(docx)
 
-    def set_font_size(self):
+    def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
         self.small_font = round(self.win_width * 0.022)
 
-    def set_window_size_and_position(self):
+    def _set_window_size_and_position(self):
         screen_width = self.winfo_screenwidth()
         screen_height = self.winfo_screenheight()
 
@@ -78,7 +78,7 @@ class App(tk.Tk):
         )
 
         # set the font sizes
-        self.set_font_size()
+        self._set_font_size()
 
 
 if __name__ == "__main__":

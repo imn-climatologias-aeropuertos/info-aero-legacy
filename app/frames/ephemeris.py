@@ -116,5 +116,5 @@ class Ephemeris(Frame):
 
         self.data.pack()
 
-    def get_ephmeris_time(self):
+    def get_ephemeris_time(self):
         return self.sunrise.entry.get(), self.sunset.entry.get()
