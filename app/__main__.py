@@ -47,9 +47,13 @@ class App(tk.Tk):
             small_font=self.small_font,
         )
 
-        self.ephemeris = Ephemeris(master=self)
+        self.ephemeris = Ephemeris(master=self, big_font=self.big_font)
 
-        tk.Button(text="Get values", command=self.print_user).pack()
+        # Footer buttons
+        tk.Label(self, width=self.win_width, height=0-5, bg=white).pack()
+        tk.Button(self, text="Crear Informe", pady=10, padx=20, relief="flat", fg=white, bg=light_blue,  command=self.print_user,).pack()
+        tk.Label(self, width=self.win_width, height=0-5, bg=white).pack()
+        tk.Button(self, text="Salir", relief="flat", fg=white, bg=light_blue, command=self.destroy).pack()
 
     def print_user(self):
         print("Hora efemérides", self.ephemeris.get_ephmeris_time())
