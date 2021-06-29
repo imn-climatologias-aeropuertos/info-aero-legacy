@@ -19,7 +19,7 @@ class Header(Frame):
     def create_widgets(self):
         # set the imn logo
         self.imn = ImageTk.PhotoImage(
-            Image.open("./app/assets/img/logo_imn.png").resize(
+            Image.open("assets/img/logo_imn.png").resize(
                 self._image_size(3.6), Image.ANTIALIAS
             )
         )
@@ -40,7 +40,7 @@ class Header(Frame):
 
         # set the minae logo
         self.minae = ImageTk.PhotoImage(
-            Image.open("./app/assets/img/logo_minae.png").resize(
+            Image.open("assets/img/logo_minae.png").resize(
                 self._image_size(3, height_cut=30), Image.ANTIALIAS
             )
         )

@@ -6,7 +6,7 @@ from ..__colors__ import light_blue
 from .date_utils import date2str
 
 def view_creator(func):
-    template_path = "app/assets/img/template.png"
+    template_path = "assets/img/template.png"
 
     def wrapper(*args, **kwargs):
         img = Image.open(template_path)

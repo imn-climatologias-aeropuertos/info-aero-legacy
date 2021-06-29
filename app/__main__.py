@@ -23,9 +23,9 @@ class App(tk.Tk):
 
         # Set the app icon
         if system() == "Windows":
-            self.iconbitmap("./app/assets/icons/plane.ico")
+            self.iconbitmap("assets/icons/plane.ico")
         else:
-            icon = tk.PhotoImage(file="./app/assets/icons/plane.png")
+            icon = tk.PhotoImage(file="assets/icons/plane.png")
             self.tk.call("wm", "iconphoto", self._w, icon)
 
         # Crete all frames
@@ -79,9 +79,9 @@ class App(tk.Tk):
             extract(docx)
 
     def _create_report(self):
-        title_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 90)
-        subtitle_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 75)
-        text_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 55)
+        title_font = ImageFont.truetype("assets/fonts/verdana.ttf", 90)
+        subtitle_font = ImageFont.truetype("assets/fonts/verdana.ttf", 75)
+        text_font = ImageFont.truetype("assets/fonts/verdana.ttf", 55)
         print("Hora efemérides", self.ephemeris.get_ephemeris_time())
         create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font, map=self.header.sigwx_map)
         create_map_img2("02_map.png", font=text_font)
