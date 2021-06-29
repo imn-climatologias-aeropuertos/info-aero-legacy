@@ -1,10 +1,13 @@
 import tkinter as tk
 from platform import system
 
+from PIL import Image, ImageDraw, ImageFont
+
 from .__colors__ import light_blue, white
 from .__version__ import version
 from .frames import Climatology, Ephemeris, Header, SelectUser
 from .utils import extract
+from .utils.create_view import create_map_img, create_map_img2
 
 
 class App(tk.Tk):
@@ -50,17 +53,38 @@ class App(tk.Tk):
         self.ephemeris = Ephemeris(master=self, big_font=self.big_font)
 
         # Footer buttons
-        tk.Label(self, width=self.win_width, height=0-5, bg=white).pack()
-        tk.Button(self, text="Crear Informe", pady=10, padx=20, relief="flat", fg=white, bg=light_blue,  command=self.print_user,).pack()
-        tk.Label(self, width=self.win_width, height=0-5, bg=white).pack()
-        tk.Button(self, text="Salir", relief="flat", fg=white, bg=light_blue, command=self.destroy).pack()
-
-    def print_user(self):
-        print("Hora efemérides", self.ephemeris.get_ephemeris_time())
+        tk.Label(self, width=self.win_width, height=0 - 5, bg=white).pack()
+        tk.Button(
+            self,
+            text="Crear Informe",
+            pady=10,
+            padx=20,
+            relief="flat",
+            fg=white,
+            bg=light_blue,
+            command=self._create_report,
+        ).pack()
+        tk.Label(self, width=self.win_width, height=0 - 5, bg=white).pack()
+        tk.Button(
+            self,
+            text="Salir",
+            relief="flat",
+            fg=white,
+            bg=light_blue,
+            command=self.destroy,
+        ).pack()
 
     def _extract_images(self):
         for docx in self.header.docx_files:
             extract(docx)
+
+    def _create_report(self):
+        title_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 90)
+        subtitle_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 75)
+        text_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 55)
+        print("Hora efemérides", self.ephemeris.get_ephemeris_time())
+        create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font)
+        create_map_img2("02_map.png", font=text_font)
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)

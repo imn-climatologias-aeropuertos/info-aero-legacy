@@ -1,1 +1,1 @@
-from .extract_img import extract
+from .docx2img import extract
