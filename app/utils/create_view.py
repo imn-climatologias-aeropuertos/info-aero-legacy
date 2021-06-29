@@ -3,9 +3,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
 from ..__colors__ import light_blue
-
-TODAY = datetime.today()
-
+from .date_utils import date2str
 
 def view_creator(func):
     template_path = "app/assets/img/template.png"
@@ -13,30 +11,35 @@ def view_creator(func):
     def wrapper(*args, **kwargs):
         img = Image.open(template_path)
         draw = ImageDraw.Draw(img)
-        draw = func(draw=draw, **kwargs)
+        # img, draw = func(img=img, draw=draw, **kwargs)
+        func(img=img, draw=draw, **kwargs)
         img.save("images/" + args[0])
 
     return wrapper
 
 
-def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=600, y=120):
-    return draw.text((x, y), text, font=font, fill=light_blue)
+def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=100):
+    draw.text((x, y), text, font=font, fill=light_blue)
 
 
 def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=700, y=230):
-    return draw.text((x, y), text, font=font, fill=light_blue)
+    draw.text((x, y), text, font=font, fill=light_blue)
 
 
 @view_creator
 def create_map_img(*args, **kwargs):
+    img = kwargs.get("img")
+    map_img_path = kwargs.get("map").name
     draw = kwargs.get("draw")
     title_font = kwargs.get("title_font")
     subtitle_font = kwargs.get("subtitle_font")
 
-    draw = _make_title(draw, "Meteorologia Aeronáutica", title_font)
-
-    draw.text((700, 230), "Fecha", font=subtitle_font, fill=light_blue)
-    return draw
+    _make_title(draw, "METEOROLOGÍA AERONÁUTICA", title_font, x=450)
+    _make_subtitle(draw, date2str().capitalize(), subtitle_font)
+    
+    map_img = Image.open(map_img_path)
+    map_img = map_img.resize((1900, 1229))
+    img.paste(map_img, (250, 370))
 
 
 @view_creator

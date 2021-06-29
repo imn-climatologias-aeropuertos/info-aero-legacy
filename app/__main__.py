@@ -83,7 +83,7 @@ class App(tk.Tk):
         subtitle_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 75)
         text_font = ImageFont.truetype("app/assets/fonts/verdana.ttf", 55)
         print("Hora efemérides", self.ephemeris.get_ephemeris_time())
-        create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font)
+        create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font, map=self.header.sigwx_map)
         create_map_img2("02_map.png", font=text_font)
 
     def _set_font_size(self):
