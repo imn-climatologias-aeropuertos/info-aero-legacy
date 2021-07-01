@@ -46,6 +46,12 @@ class Header(Frame):
         )
         self.logo_minae = Label(self, image=self.minae, bd=0, bg=white)
         self.logo_minae.grid(row=0, column=4, pady=10)
+    
+    def get_docx_files(self, dtype="avisos"):
+        l = sorted(self.docx_files)
+        if dtype == "tendencia":
+            return l[-1]
+        return l[:3]
 
     def _select_map(self):
         filetypes = (
