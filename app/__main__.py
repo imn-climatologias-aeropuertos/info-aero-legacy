@@ -7,7 +7,7 @@ from .__colors__ import light_blue, white
 from .__version__ import version
 from .frames import Climatology, Ephemeris, Header, SelectUser
 from .utils import extract
-from .utils.create_view import create_map_img, create_map_img2
+from .utils.create_view import create_map_img, create_trend01, create_trend02
 
 
 class App(tk.Tk):
@@ -63,6 +63,7 @@ class App(tk.Tk):
             fg=white,
             bg=light_blue,
             command=self._create_report,
+            #command=self._extract_images,
         ).pack()
         tk.Label(self, width=self.win_width, height=0 - 5, bg=white).pack()
         tk.Button(
@@ -75,16 +76,18 @@ class App(tk.Tk):
         ).pack()
 
     def _extract_images(self):
+        print(self.header.get_docx_files())
         for docx in self.header.docx_files:
             extract(docx)
 
     def _create_report(self):
-        title_font = ImageFont.truetype("assets/fonts/verdana.ttf", 90)
-        subtitle_font = ImageFont.truetype("assets/fonts/verdana.ttf", 75)
-        text_font = ImageFont.truetype("assets/fonts/verdana.ttf", 55)
+        title_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 86)
+        subtitle_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 68)
+        text_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 48)
         print("Hora efemérides", self.ephemeris.get_ephemeris_time())
-        create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font, map=self.header.sigwx_map)
-        create_map_img2("02_map.png", font=text_font)
+        #create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font, map=self.header.sigwx_map)
+        create_trend01("02_trend.png", title_font=title_font, subtitle_font=subtitle_font, text_font=text_font, docx=self.header.get_docx_files("tendencia"))
+        create_trend02("03_trend.png", title_font=title_font, subtitle_font=subtitle_font, text_font=text_font, docx=self.header.get_docx_files("tendencia"))
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)

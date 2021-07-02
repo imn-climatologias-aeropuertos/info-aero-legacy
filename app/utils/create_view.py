@@ -1,8 +1,11 @@
 from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
+from docx import Document
+from justifytext import justify
+import re
 
-from ..__colors__ import light_blue
+from ..__colors__ import light_blue, blue
 from .date_utils import date2str
 
 def view_creator(func):
@@ -18,12 +21,21 @@ def view_creator(func):
     return wrapper
 
 
-def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=100):
+def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90):
+    text = text.center(46, " ")
     draw.text((x, y), text, font=font, fill=light_blue)
 
 
-def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=700, y=230):
+def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=210):
+    text = text.center(40, " ")
     draw.text((x, y), text, font=font, fill=light_blue)
+
+
+def _make_text(draw: ImageDraw.Draw, text: str, font: ImageFont, x=200, y=325, color=blue):
+    ltext = justify(text, 70)
+    draw.text((x, y), "\n".join(ltext), font=font, fill=color)
+    
+    return len(ltext * 50)
 
 
 @view_creator
@@ -34,20 +46,71 @@ def create_map_img(*args, **kwargs):
     title_font = kwargs.get("title_font")
     subtitle_font = kwargs.get("subtitle_font")
 
-    _make_title(draw, "METEOROLOGÍA AERONÁUTICA", title_font, x=450)
+    _make_title(draw, "Meteorología Aeronáutica", title_font)
     _make_subtitle(draw, date2str().capitalize(), subtitle_font)
     
     map_img = Image.open(map_img_path)
-    map_img = map_img.resize((1900, 1229))
-    img.paste(map_img, (250, 370))
+    map_img = map_img.resize((2000, 1294))
+    img.paste(map_img, (200, 335))
+
+class TrendText:
+    
+    def __init__(self, path):
+        self.document = Document(path)
+        self._text_from_docx()
+    
+    def _text_from_docx(self):
+        self.paragraphs = [p.text for p in self.document.paragraphs if not re.match(r"^\s*$", p.text)]
+        self.title = self.paragraphs[0]
+        self.subtitle = self.paragraphs[1]
+        self.valid = self.paragraphs[2]
+        self.general = [p for p in self.paragraphs[3:5]]
+        self.aerodromes = [p for p in self.paragraphs[5:-1]]
+
+@view_creator
+def create_trend01(*args, **kwargs):
+    draw = kwargs.get("draw")
+    title_font = kwargs.get("title_font")
+    subtitle_font = kwargs.get("subtitle_font")
+    text_font = kwargs.get("text_font")
+    text = TrendText(kwargs.get("docx"))
+    _make_title(draw, text.title, title_font)
+    _make_subtitle(draw, text.subtitle, subtitle_font)
+    _ = _make_text(draw, text.valid, text_font, x=700)
+    
+    y_text = 500
+    _ = _make_text(draw, text.general[0], text_font, y=y_text, color=light_blue)
+    y_text += 75
+    pxls = _make_text(draw, text.general[1], text_font, y=y_text)
+    y_text += pxls + 75
+    _ = _make_text(draw, text.aerodromes[0], text_font, y=y_text, color=light_blue)
+    y_text += 75
+    _ = _make_text(draw, text.aerodromes[1], text_font, y=y_text)
 
 
 @view_creator
-def create_map_img2(*args, **kwargs):
+def create_trend02(*args, **kwargs):
     draw = kwargs.get("draw")
-    font = kwargs.get("font")
-    draw.text((600, 130), "Meteorología Aeronáutica 2", font=font, fill=light_blue)
-    return draw
+    title_font = kwargs.get("title_font")
+    subtitle_font = kwargs.get("subtitle_font")
+    text_font = kwargs.get("text_font")
+    text = TrendText(kwargs.get("docx"))
+    _make_title(draw, text.title, title_font)
+    _make_subtitle(draw, text.subtitle, subtitle_font)
+    _ = _make_text(draw, text.valid, text_font, x=700)
+    
+    y_text = 450
+    _ = _make_text(draw, text.aerodromes[2], text_font, y=y_text, color=light_blue)
+    y_text += 75
+    pxls = _make_text(draw, text.aerodromes[3], text_font, y=y_text)
+    y_text += pxls + 65
+    _ = _make_text(draw, text.aerodromes[4], text_font, y=y_text, color=light_blue)
+    y_text += 75
+    pxls = _make_text(draw, text.aerodromes[5], text_font, y=y_text)
+    y_text += pxls + 65
+    _make_text(draw, text.aerodromes[6], text_font, y=y_text, color=light_blue)
+    y_text += 75
+    _make_text(draw, text.aerodromes[7], text_font, y=y_text)
 
 
 # def make_decorator(template_path):

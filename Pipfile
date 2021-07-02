@@ -9,6 +9,8 @@ description = "Simple GUI for creating aeronautical-meteorological report from M
 pillow = "*"
 docx2txt = "*"
 suntime = "*"
+python-docx = "*"
+justifytext = "*"
 
 [dev-packages]
 isort = "*"

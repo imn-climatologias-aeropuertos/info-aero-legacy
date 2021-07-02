@@ -35,6 +35,7 @@ MANIFEST
 
 # Images/Trash directory
 trash/
+trash/*/*.txt
 images/
 
 # PyInstaller
