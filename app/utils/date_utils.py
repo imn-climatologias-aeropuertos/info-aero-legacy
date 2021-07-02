@@ -25,9 +25,9 @@ MONTHS = {
     12: "diciembre"
 }
 
-def date2str():
-    weekday = DAYS[TODAY.weekday()]
-    day = TODAY.day
-    month = MONTHS[TODAY.month]
-    year = TODAY.year
+def date2str(date=TODAY):
+    weekday = DAYS[date.weekday()]
+    day = date.day
+    month = MONTHS[date.month]
+    year = date.year
     return "{} {} de {} de {}".format(weekday, day, month, year)
