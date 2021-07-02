@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, time, timedelta
 
 TODAY = datetime.today()
 DAYS = {
@@ -8,7 +8,7 @@ DAYS = {
     3: "jueves",
     4: "viernes",
     5: "sábado",
-    6: "domingo"
+    6: "domingo",
 }
 MONTHS = {
     1: "enero",
@@ -22,8 +22,9 @@ MONTHS = {
     9: "setiembre",
     10: "octubre",
     11: "noviembre",
-    12: "diciembre"
+    12: "diciembre",
 }
+
 
 def date2str(date=TODAY):
     weekday = DAYS[date.weekday()]
@@ -31,3 +32,8 @@ def date2str(date=TODAY):
     month = MONTHS[date.month]
     year = date.year
     return "{} {} de {} de {}".format(weekday, day, month, year)
+
+
+def tomorrow2str():
+    tomorrow = TODAY + timedelta(days=1)
+    return date2str(date=tomorrow)

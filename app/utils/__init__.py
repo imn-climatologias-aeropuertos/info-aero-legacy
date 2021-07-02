@@ -1,1 +1,1 @@
-from .docx2img import extract
+from .docx2img import VOLCANOES, extract
