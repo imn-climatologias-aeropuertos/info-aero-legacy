@@ -1,23 +1,30 @@
 import re
+import os
 from datetime import datetime
 
 from docx import Document
 from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
+from requests import get
 
 from ..__colors__ import blue, light_blue
-from .date_utils import date2str, tomorrow2str
+from .date_utils import date2str, tomorrow2str, TODAY
+from .taf_model import TAF
 
 
 def view_creator(func):
     template_path = "assets/img/template.png"
+    
+    dirname = "images/output"
+    if not os.path.exists(dirname):
+        os.makedirs(dirname)
 
     def wrapper(*args, **kwargs):
         img = Image.open(template_path)
         draw = ImageDraw.Draw(img)
         # img, draw = func(img=img, draw=draw, **kwargs)
         func(img=img, draw=draw, **kwargs)
-        img.save("images/" + args[0])
+        img.save("images/output/" + args[0])
 
     return wrapper
 
@@ -33,10 +40,14 @@ def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=21
 
 
 def _make_text(
-    draw: ImageDraw.Draw, text: str, font: ImageFont, x=200, y=325, color=blue
+    draw: ImageDraw.Draw, text: str, font: ImageFont, x=200, y=325, color=blue, just=True
 ):
-    ltext = justify(text, 70)
-    draw.text((x, y), "\n".join(ltext), font=font, fill=color)
+    if just is True:
+        ltext = justify(text, 70)
+        draw.text((x, y), "\n".join(ltext), font=font, fill=color)
+    else:
+        ltext = text.split("\n")
+        draw.text((x, y), text, font=font, fill=color)
 
     return len(ltext * 50)
 
@@ -152,6 +163,41 @@ def create_volcanic_ash(*args, **kwargs):
     _paste_vash_img(img, 1, dirname)
     _paste_vash_img(img, 2, dirname, img_size=(850, 797), paste_pos=(1230, 700))
 
+
+# BASE_TAF_URL = "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{}.TXT"
+BASE_TAF_URL = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=1"
+
+@view_creator
+def create_taf(*args, **kwargs):
+    draw = kwargs.get("draw")
+    title_font = kwargs.get("title_font")
+    text_font = kwargs.get("text_font")
+    
+    _make_title(draw, "Terminal Aerodrome Forecast (TAF)", title_font)
+    
+    subtitle = "TAF válidos hasta las {}:00Z del {}"
+    if TODAY.hour >= 17:
+        subtitle = subtitle.format("00", tomorrow2str(days=2))
+    elif TODAY.hour >= 11:
+        subtitle = subtitle.format("18", tomorrow2str())
+    else:
+        subtitle = subtitle.format("12", tomorrow2str())
+    _make_subtitle(draw, subtitle, text_font, x=330, y=280)
+    
+    y_text = 420
+    for stn in ["MROC", "MRLB", "MRLM", "MRPV"]:
+        url = BASE_TAF_URL.format(stn)
+        res = get(url)
+        taf = res.text.split("\n")
+        # COMMENT IF USE NOAA's URL
+        taf = taf[6].split(",")
+        taf = TAF(taf[0])
+        pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
+        # COMMENT IF USE AVIATIONWEATHER's URL
+        # taf = taf[1:-1]
+        # taf = re.sub(r"TAF\s+", "", "\n".join(taf))
+        # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
+        y_text += pxls + 35
 
 # def make_decorator(template_path):
 #     def decorator(func):

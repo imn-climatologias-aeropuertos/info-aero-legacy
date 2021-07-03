@@ -34,6 +34,6 @@ def date2str(date=TODAY):
     return "{} {} de {} de {}".format(weekday, day, month, year)
 
 
-def tomorrow2str():
-    tomorrow = TODAY + timedelta(days=1)
+def tomorrow2str(days=1):
+    tomorrow = TODAY + timedelta(days=days)
     return date2str(date=tomorrow)

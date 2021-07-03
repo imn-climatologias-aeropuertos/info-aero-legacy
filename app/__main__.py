@@ -9,6 +9,7 @@ from .frames import Climatology, Ephemeris, Header, SelectUser
 from .utils import VOLCANOES, extract
 from .utils.create_view import (
     create_map_img,
+    create_taf,
     create_trend01,
     create_trend02,
     create_volcanic_ash,
@@ -84,26 +85,31 @@ class App(tk.Tk):
             extract(docx)
 
     def _create_report(self):
-        title_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 86)
-        subtitle_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 68)
-        text_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 48)
+        # title_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 86)
+        # subtitle_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 68)
+        # text_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 48)
+        title_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 86)
+        subtitle_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 68)
+        text_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 48)
         print("Hora efemérides", self.ephemeris.get_ephemeris_time())
         # create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font, map=self.header.sigwx_map)
         # create_trend01("02_trend.png", title_font=title_font, subtitle_font=subtitle_font, text_font=text_font, docx=self.header.get_docx_files("tendencia"))
         # create_trend02("03_trend.png", title_font=title_font, subtitle_font=subtitle_font, text_font=text_font, docx=self.header.get_docx_files("tendencia"))
 
-        self._extract_images_from_docx()
-        img_num = 4
-        for volcano in VOLCANOES:
-            create_volcanic_ash(
-                f"0{img_num}_vash.png",
-                name=volcano.name,
-                dir=volcano.dirname,
-                title_font=title_font,
-                subtitle_font=subtitle_font,
-                text_font=text_font,
-            )
-            img_num += 1
+        # self._extract_images_from_docx()
+        # img_num = 4
+        # for volcano in VOLCANOES:
+        #     create_volcanic_ash(
+        #         f"0{img_num}_vash.png",
+        #         name=volcano.name,
+        #         dir=volcano.dirname,
+        #         title_font=title_font,
+        #         subtitle_font=subtitle_font,
+        #         text_font=text_font,
+        #     )
+        #     img_num += 1
+        
+        create_taf("07_taf.png", title_font=title_font, text_font=text_font)
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
