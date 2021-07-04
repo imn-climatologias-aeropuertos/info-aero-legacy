@@ -9,6 +9,7 @@ class TAF:
     
     def handler(self):
         pattern = r"BECMG|BECMG0|BCEMG|BCMG|TEMPO|TEMOP|TEPO|TEMO|FM|MF|PROB|PROV"
+        self.raw_text = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", self.raw_text)
         ltext = self.raw_text.split(" ")
         self.formated = ""
         

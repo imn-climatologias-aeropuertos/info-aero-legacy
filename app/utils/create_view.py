@@ -195,7 +195,7 @@ def create_taf(*args, **kwargs):
         pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
         # COMMENT IF USE AVIATIONWEATHER's URL
         # taf = taf[1:-1]
-        # taf = re.sub(r"TAF\s+", "", "\n".join(taf))
+        # taf = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", "\n".join(taf))
         # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
         y_text += pxls + 35
 
