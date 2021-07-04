@@ -1,20 +1,21 @@
-import re
 import os
+import re
 from datetime import datetime
+from textwrap import fill
 
 from docx import Document
 from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
 from requests import get
 
-from ..__colors__ import blue, light_blue
-from .date_utils import date2str, tomorrow2str, TODAY
+from ..__colors__ import blue, grey, light_blue, white
+from .date_utils import TODAY, date2str, tomorrow2str
 from .taf_model import TAF
 
 
 def view_creator(func):
     template_path = "assets/img/template.png"
-    
+
     dirname = "images/output"
     if not os.path.exists(dirname):
         os.makedirs(dirname)
@@ -40,7 +41,13 @@ def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=21
 
 
 def _make_text(
-    draw: ImageDraw.Draw, text: str, font: ImageFont, x=200, y=325, color=blue, just=True
+    draw: ImageDraw.Draw,
+    text: str,
+    font: ImageFont,
+    x=200,
+    y=325,
+    color=blue,
+    just=True,
 ):
     if just is True:
         ltext = justify(text, 70)
@@ -167,14 +174,15 @@ def create_volcanic_ash(*args, **kwargs):
 # BASE_TAF_URL = "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{}.TXT"
 BASE_TAF_URL = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=1"
 
+
 @view_creator
 def create_taf(*args, **kwargs):
     draw = kwargs.get("draw")
     title_font = kwargs.get("title_font")
     text_font = kwargs.get("text_font")
-    
+
     _make_title(draw, "Terminal Aerodrome Forecast (TAF)", title_font)
-    
+
     subtitle = "TAF válidos hasta las {}:00Z del {}"
     if TODAY.hour >= 17:
         subtitle = subtitle.format("00", tomorrow2str(days=2))
@@ -183,7 +191,7 @@ def create_taf(*args, **kwargs):
     else:
         subtitle = subtitle.format("12", tomorrow2str())
     _make_subtitle(draw, subtitle, text_font, x=330, y=280)
-    
+
     y_text = 420
     for stn in ["MROC", "MRLB", "MRLM", "MRPV"]:
         url = BASE_TAF_URL.format(stn)
@@ -198,6 +206,93 @@ def create_taf(*args, **kwargs):
         # taf = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", "\n".join(taf))
         # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
         y_text += pxls + 35
+
+
+def _draw_winds_table(draw: ImageDraw.Draw):
+    # light blue rectangle
+    draw.rectangle((400, 450, 2208, 700), fill=light_blue)
+
+    # grey rectangles
+    x_left = 400
+    for i in range(2):
+        x_right = x_left + 452
+        draw.rectangle((x_left, 700, x_right, 1606), fill=grey)
+        x_left += 904
+
+    # longest vertical lines
+    x_left = 400
+    for i in range(5):
+        draw.line((x_left, 448, x_left, 1608), fill=blue, width=5)
+        x_left += 452
+
+    # middle vertical lines
+    x_left = 512
+    for i in range(4):
+        for j in range(3):
+            draw.line((x_left, 550, x_left, 1606), fill=blue, width=5)
+            x_left += 113
+        x_left += 113
+
+    # light blue rectanle horizontal lines
+    y_top = 450
+    for i in range(3):
+        if i == 1:
+            y_top += 25
+        draw.line((400, y_top, 2208, y_top), fill=blue, width=5)
+        y_top += 75
+
+    # longest horizontal lines
+    for i in range(7):
+        draw.line((148, y_top, 2210, y_top), fill=blue, width=5)
+        y_top += 151
+    # most left vertical line
+    draw.line((150, 700, 150, 1606), fill=blue, width=5)
+
+
+def _write_winds_table_text(draw: ImageDraw.Draw, font: ImageFont):
+    draw.text((210, 570), "Fecha", font=font, fill=blue)
+    draw.text((180, 635), "Hora UTC", font=font, fill=blue)
+    draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=font, fill=blue)
+
+    note = "Nota: los datos aquí presentados corresponden al promedio de las 6 horas anteriores. La dirección corresponde a la procedencia del viento."
+    note = justify(note, 75, justify_last_line=True)
+    draw.text(
+        (150, 1720),
+        "\n".join(note),
+        font=ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 32),
+        fill=white,
+    )
+
+    levels = [
+        " 300 hPa \n33.000 ft",
+        " 400 hPa \n25.000 ft",
+        " 500 hPa \n20.000 ft",
+        " 700 hPa \n10.000 ft",
+        " 850 hPa \n 5.000 ft",
+        " 925 hPa \n 3.000 ft",
+    ]
+    y_top = 730
+    for level in levels:
+        draw.text((170, y_top), level, font=font, fill=blue)
+        y_top += 151
+
+
+@view_creator
+def create_winds(*args, **kwargs):
+    draw = kwargs.get("draw")
+    title_font = kwargs.get("title_font")
+    subtitle_font = kwargs.get("subtitle_font")
+    table_font = kwargs.get("table_font")
+
+    _make_title(draw, "Vientos en Altura", title_font)
+    _make_subtitle(draw, "Dirección y Velocidad (kt)", subtitle_font)
+    _make_text(
+        draw, f"Válido hasta las {'12'}:00Z del {tomorrow2str()}", subtitle_font, x=100
+    )
+
+    _draw_winds_table(draw)
+    _write_winds_table_text(draw, table_font)
+
 
 # def make_decorator(template_path):
 #     def decorator(func):

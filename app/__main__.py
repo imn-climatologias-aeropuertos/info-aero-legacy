@@ -13,6 +13,7 @@ from .utils.create_view import (
     create_trend01,
     create_trend02,
     create_volcanic_ash,
+    create_winds,
 )
 
 
@@ -91,6 +92,7 @@ class App(tk.Tk):
         title_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 86)
         subtitle_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 68)
         text_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 48)
+        table_font = ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 40)
         print("Hora efemérides", self.ephemeris.get_ephemeris_time())
         # create_map_img("01_map.png", title_font=title_font, subtitle_font=subtitle_font, map=self.header.sigwx_map)
         # create_trend01("02_trend.png", title_font=title_font, subtitle_font=subtitle_font, text_font=text_font, docx=self.header.get_docx_files("tendencia"))
@@ -108,8 +110,13 @@ class App(tk.Tk):
         #         text_font=text_font,
         #     )
         #     img_num += 1
-        
-        create_taf("07_taf.png", title_font=title_font, text_font=text_font)
+        # create_taf("07_taf.png", title_font=title_font, text_font=text_font)
+        create_winds(
+            "08_winds.png",
+            title_font=title_font,
+            subtitle_font=subtitle_font,
+            table_font=table_font,
+        )
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
