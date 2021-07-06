@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from textwrap import fill
 
 from docx import Document
@@ -9,8 +9,9 @@ from PIL import Image, ImageDraw, ImageFont
 from requests import get
 
 from ..__colors__ import blue, grey, light_blue, white
-from .date_utils import TODAY, date2str, tomorrow2str
+from .date_utils import TODAY, TOMORROW, date2str, tomorrow2str
 from .taf_model import TAF
+from .winds_model import Wind
 
 
 def view_creator(func):
@@ -25,14 +26,15 @@ def view_creator(func):
         draw = ImageDraw.Draw(img)
         # img, draw = func(img=img, draw=draw, **kwargs)
         func(img=img, draw=draw, **kwargs)
+        img = img.resize((1200, 900))
         img.save("images/output/" + args[0])
 
     return wrapper
 
 
-def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90):
+def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90, color=light_blue):
     text = text.center(46, " ")
-    draw.text((x, y), text, font=font, fill=light_blue)
+    draw.text((x, y), text, font=font, fill=color)
 
 
 def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=210):
@@ -276,22 +278,86 @@ def _write_winds_table_text(draw: ImageDraw.Draw, font: ImageFont):
         draw.text((170, y_top), level, font=font, fill=blue)
         y_top += 151
 
+BASE_WINDS_U_URL = "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_U.txt"
+BASE_WINDS_V_URL = "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_V.txt"
+
+def _sanitize_str(s):
+    s = re.sub(r"\s{2,}", " ", s)
+    s = s.strip()
+    
+    return s
+
+def _process_response(u_text, v_text):
+    indexes = (6, 9)
+    u_temp = u_text.text.split("\n")
+    u_temp = [u_temp[indexes[0]]] + u_temp[indexes[1]:-1]
+    v_temp = v_text.text.split("\n")
+    v_temp = [v_temp[indexes[0]]] + v_temp[indexes[1]:-1]
+    
+    u, v = [], []
+    for u_el, v_el in zip(u_temp, v_temp):
+        u_el = _sanitize_str(u_el)
+        v_el = _sanitize_str(v_el)
+        
+        u.append(u_el.upper())
+        v.append(v_el.upper())
+
+    return u, v
+
+
+def _get_winds_data():
+    winds = {}
+    for stn in ["MROC", "MRLB", "MRLM", "MRPV"]:
+        u_url = BASE_WINDS_U_URL.format(stn)
+        v_url = BASE_WINDS_V_URL.format(stn)
+        u_res = get(u_url)
+        v_res = get(v_url)
+        u, v = _process_response(u_res, v_res)
+
+        winds[stn] = Wind(u, v)
+    
+    return winds
+
+
+def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict, title_font: ImageFont, text_font: ImageFont):
+    date = TODAY
+    x = 400
+    y = 450
+    for stn, wind in winds.items():
+        _make_text(draw, stn, title_font, x=x+130, y=y, color=white)
+        _x = 25
+        for time in wind.hours:
+            _y = 120
+            _make_text(draw, "{:02d}".format(date.day), text_font, x=x+_x+10, y=y+_y, color=white)
+            _y += 75
+            _make_text(draw, time, text_font, x=x+_x, y=y+_y, color=white)
+            _y += 85
+            for level in [300, 400, 500, 700, 850, 925]:
+                text = wind.values(time, level)
+                _make_text(draw, text, text_font, x=x+_x, y=y+_y, color=blue, just=False)
+                _y += 151
+            _x += 113
+            date = TOMORROW
+        x += 450
 
 @view_creator
 def create_winds(*args, **kwargs):
     draw = kwargs.get("draw")
     title_font = kwargs.get("title_font")
     subtitle_font = kwargs.get("subtitle_font")
+    text_font = kwargs.get("text_font")
     table_font = kwargs.get("table_font")
 
     _make_title(draw, "Vientos en Altura", title_font)
     _make_subtitle(draw, "Dirección y Velocidad (kt)", subtitle_font)
     _make_text(
-        draw, f"Válido hasta las {'12'}:00Z del {tomorrow2str()}", subtitle_font, x=100
+        draw, f"Válido hasta las {'12'}:00Z del {tomorrow2str()}", text_font, x=400, y=345
     )
 
     _draw_winds_table(draw)
     _write_winds_table_text(draw, table_font)
+    winds = _get_winds_data()
+    _write_winds_on_table(draw, winds, title_font, table_font)
 
 
 # def make_decorator(template_path):

@@ -1,6 +1,8 @@
 from datetime import datetime, time, timedelta
 
 TODAY = datetime.today()
+TOMORROW = TODAY + timedelta(days=1)
+YESTERDAY = TODAY - timedelta(days=1)
 DAYS = {
     0: "lunes",
     1: "martes",

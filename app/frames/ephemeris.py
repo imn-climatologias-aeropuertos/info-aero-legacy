@@ -4,7 +4,8 @@ from tkinter import Entry, Frame, Label
 from dateutil import tz
 from suntime import Sun
 
-from ..__colors__ import blue, light_blue, white
+from app.__colors__ import blue, light_blue, white
+from app.utils import TODAY, TOMORROW
 
 
 class Hour(Frame):
@@ -66,11 +67,11 @@ class Hour(Frame):
         tzone = tz.gettz("America/Costa_Rica")
 
         if self.ephem == "sunrise":
-            d = sun.get_sunrise_time()
+            d = sun.get_local_sunrise_time(date=TOMORROW, local_time_zone=tzone)
         else:
-            d = sun.get_sunset_time()
+            d = sun.get_local_sunset_time(date=TODAY, local_time_zone=tzone)
 
-        self.date = d.astimezone(tz=tzone)
+        self.date = d
 
 
 class Ephemeris(Frame):
