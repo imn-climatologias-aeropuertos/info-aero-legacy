@@ -7,7 +7,7 @@ from .__colors__ import light_blue, white
 from .__version__ import version
 from .frames import Climatology, Ephemeris, Header, SelectUser
 from .utils import VOLCANOES, extract
-from .utils.create_view import (create_map_img, create_taf, create_trend01,
+from .utils.create_view import (create_clima, create_map_img, create_taf, create_trend01,
                                 create_trend02, create_volcanic_ash,
                                 create_winds)
 
@@ -81,6 +81,8 @@ class App(tk.Tk):
             extract(docx)
 
     def _create_report(self):
+        user = self.select_user.get_user()
+        user = (user.name, user.email)
         # title_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 86)
         # subtitle_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 68)
         # text_font = ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 48)
@@ -106,13 +108,17 @@ class App(tk.Tk):
         #    )
         #    img_num += 1
         #create_taf("07_taf.png", title_font=title_font, text_font=text_font)
-        create_winds(
-            "08_winds.png",
-            title_font=title_font,
+        #create_winds(
+        #    "08_winds.png",
+        #    title_font=title_font,
+        #    subtitle_font=subtitle_font,
+        #    text_font=text_font,
+        #    table_font=table_font,
+        #)
+        create_clima("09_clima.png", title_font=title_font,
             subtitle_font=subtitle_font,
             text_font=text_font,
-            table_font=table_font,
-        )
+            table_font=table_font, clima=self.clima.stations, ephemeris=self.ephemeris.get_ephemeris_time(), user=user)
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)

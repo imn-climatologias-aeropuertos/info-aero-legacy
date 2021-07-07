@@ -2,6 +2,7 @@ import os
 import re
 from datetime import datetime, timedelta
 from textwrap import fill
+from typing import List
 
 from docx import Document
 from justifytext import justify
@@ -9,9 +10,10 @@ from PIL import Image, ImageDraw, ImageFont
 from requests import get
 
 from ..__colors__ import blue, grey, light_blue, white
-from .date_utils import TODAY, TOMORROW, date2str, tomorrow2str
+from .date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
 from .taf_model import TAF
 from .winds_model import Wind
+from app.frames.clima import Station
 
 
 def view_creator(func):
@@ -60,6 +62,9 @@ def _make_text(
 
     return len(ltext * 50)
 
+###########################################################################
+############################## CREATE MAP VIEW ############################
+###########################################################################
 
 @view_creator
 def create_map_img(*args, **kwargs):
@@ -76,6 +81,10 @@ def create_map_img(*args, **kwargs):
     map_img = map_img.resize((2000, 1294))
     img.paste(map_img, (200, 335))
 
+
+###########################################################################
+############################# CREATE TREND VIEW ###########################
+###########################################################################
 
 class TrendText:
     def __init__(self, path):
@@ -139,6 +148,10 @@ def create_trend02(*args, **kwargs):
     _make_text(draw, text.aerodromes[7], text_font, y=y_text)
 
 
+###########################################################################
+############################# CREATE VASH VIEW ############################
+###########################################################################
+
 vash_text = "Modelos de dispersión de ceniza volcánica, validez hasta las 12:00Z del {}. Indica la dispersión de la ceniza volcánica para los 3350, 4000 y 5000 msnm, en erupciones superiores a los 500 m."
 
 
@@ -172,6 +185,10 @@ def create_volcanic_ash(*args, **kwargs):
     _paste_vash_img(img, 1, dirname)
     _paste_vash_img(img, 2, dirname, img_size=(850, 797), paste_pos=(1230, 700))
 
+
+###########################################################################
+############################## CREATE TAF VIEW ############################
+###########################################################################
 
 # BASE_TAF_URL = "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{}.TXT"
 BASE_TAF_URL = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=1"
@@ -209,6 +226,10 @@ def create_taf(*args, **kwargs):
         # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
         y_text += pxls + 35
 
+
+###########################################################################
+############################# CREATE WINDS VIEW ###########################
+###########################################################################
 
 def _draw_winds_table(draw: ImageDraw.Draw):
     # light blue rectangle
@@ -253,7 +274,7 @@ def _draw_winds_table(draw: ImageDraw.Draw):
 
 def _write_winds_table_text(draw: ImageDraw.Draw, font: ImageFont):
     draw.text((210, 570), "Fecha", font=font, fill=blue)
-    draw.text((180, 635), "Hora UTC", font=font, fill=blue)
+    draw.text((180, 640), "Hora UTC", font=font, fill=blue)
     draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=font, fill=blue)
 
     note = "Nota: los datos aquí presentados corresponden al promedio de las 6 horas anteriores. La dirección corresponde a la procedencia del viento."
@@ -320,10 +341,10 @@ def _get_winds_data():
 
 
 def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict, title_font: ImageFont, text_font: ImageFont):
-    date = TODAY
     x = 400
     y = 450
     for stn, wind in winds.items():
+        date = TODAY
         _make_text(draw, stn, title_font, x=x+130, y=y, color=white)
         _x = 25
         for time in wind.hours:
@@ -360,18 +381,104 @@ def create_winds(*args, **kwargs):
     _write_winds_on_table(draw, winds, title_font, table_font)
 
 
-# def make_decorator(template_path):
-#     def decorator(func):
-#         def wrapper(*args, **kwargs):
-#             print("make_decorator arg:", template_path)
-#             print("Wrapper argument:", template_path)
-#             draw = template_path + "otro string"
-#             func(draw=draw)
-#             print("These are the arguments:", args)
-#         return wrapper
-#     return decorator
+###########################################################################
+############################# CREATE CLIMA VIEW ###########################
+###########################################################################
 
-# @make_decorator("path")
-# def create_map_img(*args, **kwargs):
-#     print("Esta sí tiene argumentos")
-#     print("me pasaron este argumento:", kwargs.get("draw"))
+def _draw_clima_table(draw: ImageDraw.Draw):
+    draw.rectangle((200, 350, 2200, 550), fill=light_blue)
+    
+    # draw vertical lines
+    x_left = 200
+    for i in range(5):
+        if i == 1:
+            x_left += 200
+        draw.line((x_left, 350, x_left, 950), fill=blue, width=5)
+        x_left += 450
+    
+    # draw horizontal lines
+    x_left = 198
+    y_top = 350
+    for i in range(6):
+        if i == 1:
+            y_top += 100
+        draw.line((x_left, y_top, 2202, y_top), fill=blue, width=5)
+        y_top += 100
+
+
+def _write_clima_table_text(draw: ImageDraw.Draw, title_font: ImageFont, text_font: ImageFont, clima: List[Station]):
+    titles = ["  Estación   \nMeteorológica", "  T. Máxima  \n     (°)     ", "  T. Mínima  \n     (°)     ", "Precipitación\n    (mm)     "]
+    
+    x_left = 340
+    for title in titles:
+        if titles.index(title) == 1:
+            x_left += 90
+        if titles.index(title) == 3:
+            x_left += 10
+        _make_text(draw, title, title_font, color=white, x=x_left, y=390, just=False)
+        x_left += 450
+    
+    y_top = 575
+    stations = ["Juan Santamaría (MROC)", "Daniel Oduber (MRLB)", "Limón (MRLM)", "Tobías Bolaños (MRPV)"]
+    for stn in stations:
+        stn = stn.center(25, " ")
+        _make_text(draw, stn, text_font, color=blue, x=220, y=y_top, just=False)
+        y_top += 100
+    
+    x_left = 1010
+    y_top = 575
+    for stn in clima:
+        tmax, tmin, prec = stn.get_values()
+        _make_text(draw, tmax.center(5, " "), text_font, x=x_left, y=y_top, just=False, color=blue)
+        _make_text(draw, tmin.center(5, " "), text_font, x=x_left+450, y=y_top, just=False, color=blue)
+        _make_text(draw, prec.center(5, " "), text_font, x=x_left+900, y=y_top, just=False, color=blue)
+        y_top += 100
+
+def _write_ephemeris(img: Image, draw: ImageDraw.Draw, title_font: ImageFont, text_font: ImageFont, data=("00:00 AM", "00:00 AM")):
+    _make_text(draw, "Salida y Puesta del Sol", title_font, color=blue, just=False, x=250, y=1000)
+    _make_text(draw, "Salida de mañana", text_font, color=blue, just=False, x=250, y=1100)
+    _make_text(draw, "Puesta de hoy", text_font, color=blue, just=False, x=775, y=1100)
+    
+    sunrise = Image.open("assets/img/sunrise.png")
+    sunset = Image.open("assets/img/sunset.png")
+    img.paste(sunrise, (250, 1180))
+    img.paste(sunset, (735, 1180))
+    
+    draw.rectangle((250, 1500, 1200, 1600), fill=light_blue)
+    x_left = 370
+    for d in data:
+        _make_text(draw, d, text_font, color=white, x=x_left, y=1525)
+        x_left += 500
+
+def _write_user_data(draw: ImageDraw.Draw, font, data=("Name", "email@email.com")):
+    text = "{}\n{}\n{}\n{}@imn.ac.cr\n{}".format(
+        data[0],
+        "Meteorología Aeronáutica (IMN)",
+        "Aeropuerto Int. Tobías Bolaños",
+        data[1],
+        "Telefax: (+506) 2232-2071\nWeb (IMN): www.imn.ac.cr"
+    )
+    
+    _make_text(draw, text.strip(), font, color=blue, x=1300, y=1200, just=False)
+
+@view_creator
+def create_clima(*args, **kwargs):
+    img = kwargs.get("img")
+    draw = kwargs.get("draw")
+    title_font = kwargs.get("title_font")
+    subtitle_font = kwargs.get("subtitle_font")
+    text_font = kwargs.get("text_font")
+    table_font = kwargs.get("table_font")
+    clima = kwargs.get("clima")
+    ephemeris = kwargs.get("ephemeris")
+    user = kwargs.get("user")
+    
+    yesterday = date2str(date=YESTERDAY)
+    
+    _make_title(draw, "Datos Climatológicos", title_font)
+    _make_subtitle(draw, yesterday.capitalize(), subtitle_font)
+    
+    _draw_clima_table(draw)
+    _write_clima_table_text(draw, text_font, table_font, clima)
+    _write_ephemeris(img, draw, subtitle_font, text_font, data=ephemeris)
+    _write_user_data(draw, text_font, data=user)

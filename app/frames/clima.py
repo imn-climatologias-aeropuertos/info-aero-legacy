@@ -116,7 +116,7 @@ class Climatology(Frame):
             Station(
                 master=self.data,
                 row=2,
-                name="mrpv",
+                name="mrlb",
                 width=self.width,
                 font_type=self.font_type,
                 font_size=self.small_font,
@@ -125,7 +125,7 @@ class Climatology(Frame):
             Station(
                 master=self.data,
                 row=3,
-                name="mrlb",
+                name="mrlm",
                 width=self.width,
                 font_type=self.font_type,
                 font_size=self.small_font,
@@ -135,7 +135,7 @@ class Climatology(Frame):
             Station(
                 master=self.data,
                 row=4,
-                name="mrlm",
+                name="mrpv",
                 width=self.width,
                 font_type=self.font_type,
                 font_size=self.small_font,
@@ -144,10 +144,6 @@ class Climatology(Frame):
         ]
 
         self.data.pack()
-
-    def climatology_values(self):
-        for station in self.stations:
-            print(station.get_values())
 
     def _label(self, text, row, column):
         lb = Label(
