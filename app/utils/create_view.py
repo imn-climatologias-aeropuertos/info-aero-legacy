@@ -14,6 +14,7 @@ from .date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
 from .taf_model import TAF
 from .winds_model import Wind
 from app.frames.clima import Station
+from app.frames.messagebox import box
 
 
 def view_creator(func):
@@ -156,9 +157,10 @@ vash_text = "Modelos de dispersión de ceniza volcánica, validez hasta las 12:0
 
 
 def _paste_vash_img(
-    img: Image, img_num: int, dirname: str, img_size=(850, 1055), paste_pos=(350, 550)
+    img: Image, img_num: int, name: str, dirname: str, img_size=(850, 1055), paste_pos=(350, 550)
 ):
-    for fmt in [".png", ".jpg", ".jpeg", ".bmp"]:
+    found = False
+    for fmt in [".png", ".jpg", ".gif", ".jpeg", ".bmp"]:
         try:
             dist01 = Image.open(f"images/volcanoes/{dirname}/image{img_num}{fmt}")
             dist01 = dist01.resize(img_size)
@@ -166,6 +168,11 @@ def _paste_vash_img(
             continue
         else:
             img.paste(dist01, paste_pos)
+            found = True
+            break
+    
+    if not found:
+        box("okcancel", "Faltan imágenes.", f"No se encuentra la imagen {img_num} del Volcán {name}.")
 
 
 @view_creator
@@ -182,8 +189,8 @@ def create_volcanic_ash(*args, **kwargs):
     _make_subtitle(draw, f"Volcán {name}", subtitle_font)
     _make_text(draw, vash_text.format(tomorrow2str()), text_font)
 
-    _paste_vash_img(img, 1, dirname)
-    _paste_vash_img(img, 2, dirname, img_size=(850, 797), paste_pos=(1230, 700))
+    _paste_vash_img(img, 1, name, dirname)
+    _paste_vash_img(img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700))
 
 
 ###########################################################################

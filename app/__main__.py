@@ -5,7 +5,7 @@ from PIL import Image, ImageDraw, ImageFont
 
 from .__colors__ import light_blue, white
 from .__version__ import version
-from .frames import Climatology, Ephemeris, Header, SelectUser
+from .frames import Climatology, Ephemeris, Header, SelectUser, box
 from .utils import VOLCANOES, extract
 from .utils.create_view import (create_clima, create_map_img, create_taf, create_trend01,
                                 create_trend02, create_volcanic_ash,
@@ -83,13 +83,24 @@ class App(tk.Tk):
     def _create_report(self):
         user = self.select_user.get_user()
         
+        try:
+            map = self.header.sigwx_map
+        except AttributeError:
+            box("error", "Error al abrir mapa SIGWX.", "No ha seleccionado el mapa de tiempo significante.")
+        
+        try:
+            docx = self.header.get_docx_files("tendencia")
+        except AttributeError:
+            box("error", "Error al abrir archivo .docx.", "No ha seleccionado el archivo de Tendencia de Aeropuertos.")
+            
+        
         data = {
             "title_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 86),
             "subtitle_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 68),
             "text_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 48),
             "table_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 40),
-            "map": self.header.sigwx_map,
-            "docx": self.header.get_docx_files("tendencia"),
+            "map": map,
+            "docx": docx,
             "clima": self.clima.stations,
             "ephemeris": self.ephemeris.get_ephemeris_time(),
             "user": (user.name, user.email),
@@ -122,6 +133,8 @@ class App(tk.Tk):
         
         # create climatology view
         create_clima("09_clima.png", **data)
+        
+        box("showinfo", f"AeroInformes - {version}", "Carpeta creada correctamente.")
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
