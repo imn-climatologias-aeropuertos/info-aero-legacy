@@ -459,7 +459,7 @@ def _write_user_data(draw: ImageDraw.Draw, font, data=("Name", "email@email.com"
         "Telefax: (+506) 2232-2071\nWeb (IMN): www.imn.ac.cr"
     )
     
-    _make_text(draw, text.strip(), font, color=blue, x=1300, y=1200, just=False)
+    _make_text(draw, text.strip(), font, color=blue, x=1280, y=1200, just=False)
 
 @view_creator
 def create_clima(*args, **kwargs):
