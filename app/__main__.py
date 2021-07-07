@@ -1,5 +1,7 @@
 import tkinter as tk
 from platform import system
+import os
+import glob
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -75,6 +77,14 @@ class App(tk.Tk):
             bg=light_blue,
             command=self.destroy,
         ).pack()
+        
+        self._delete_volcanic_ash_images()
+    
+    def _delete_volcanic_ash_images(self):
+        for volcano in VOLCANOES:
+            images = glob.glob(f"images/volcanoes/{volcano.dirname}/*")
+            for img in images:
+                os.remove(img)
 
     def _extract_images_from_docx(self):
         for docx in self.header.docx_files[:-1]:
