@@ -6,7 +6,8 @@ def box(type: str, title: str, message: str):
     elif type == "error":
         MessageBox.showerror(title, message)
     elif type == "okcancel":
-        MessageBox.askokcancel(title, message)
+        result = MessageBox.askokcancel(title, message)
+        return result
     elif type == "showinfo":
         MessageBox.showinfo(title, message)
     else:

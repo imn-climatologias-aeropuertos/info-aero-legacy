@@ -14,15 +14,19 @@ VOLCANOES = [
 ]
 
 
-def extract(docx_file):
-    for volcano in VOLCANOES:
-        match = re.search(volcano.regex, docx_file)
+def extract(docx_list):
+    if len(docx_list) == 0:
+        return
+    
+    for f in docx_list:
+        for volcano in VOLCANOES:
+            match = re.search(volcano.regex, f)
 
-        if match:
-            dirname = f"images/volcanoes/{volcano.dirname}"
-            if not os.path.exists(dirname):
-                os.makedirs(dirname)
+            if match:
+                dirname = f"images/volcanoes/{volcano.dirname}"
+                if not os.path.exists(dirname):
+                    os.makedirs(dirname)
 
-            docx2txt.process(docx_file, dirname)
+                docx2txt.process(f, dirname)
 
-            break
+                break

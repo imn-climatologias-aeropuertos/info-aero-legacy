@@ -1,5 +1,6 @@
 from tkinter import Button, Frame, Label
 from tkinter import filedialog as fd
+import re
 
 from PIL import Image, ImageTk
 
@@ -50,14 +51,20 @@ class Header(Frame):
     def get_docx_files(self, dtype="avisos"):
         l = sorted(self.docx_files)
         if dtype == "tendencia":
-            return l[-1]
+            for i in range(len(l)):
+                result = re.search(r"[Tt]enden[cs]ia", l[i])
+                
+                if result:
+                    return l[i]
+            
+            raise AttributeError("trend file not found.")
         return l[:3]
 
     def _select_map(self):
         filetypes = (
-            ("PNG images", ".png"),
             ("JPG images", ".jpg"),
             ("JPEG images", ".jpeg"),
+            ("PNG images", ".png"),
             ("GIF images", ".gif"),
             ("All files", "."),
         )

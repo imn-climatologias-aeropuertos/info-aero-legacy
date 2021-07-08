@@ -28,9 +28,12 @@ def view_creator(func):
         img = Image.open(template_path)
         draw = ImageDraw.Draw(img)
         # img, draw = func(img=img, draw=draw, **kwargs)
-        func(img=img, draw=draw, **kwargs)
-        img = img.resize((1200, 900))
-        img.save("images/output/" + args[0])
+        result = func(img=img, draw=draw, **kwargs)
+        if result:
+            img = img.resize((1200, 900))
+            img.save("images/output/" + args[0])
+            return False
+        return True
 
     return wrapper
 
@@ -81,6 +84,8 @@ def create_map_img(*args, **kwargs):
     map_img = Image.open(map_img_path)
     map_img = map_img.resize((2000, 1294))
     img.paste(map_img, (200, 335))
+    
+    return True
 
 
 ###########################################################################
@@ -109,11 +114,15 @@ def create_trend01(*args, **kwargs):
     title_font = kwargs.get("title_font")
     subtitle_font = kwargs.get("subtitle_font")
     text_font = kwargs.get("text_font")
-    text = TrendText(kwargs.get("docx"))
+    docx = kwargs.get("docx")
+
+    if docx is None:
+        return
+    text = TrendText(docx)
     _make_title(draw, text.title, title_font)
     _make_subtitle(draw, text.subtitle, subtitle_font)
     _ = _make_text(draw, text.valid, text_font, x=700)
-
+    
     y_text = 500
     _ = _make_text(draw, text.general[0], text_font, y=y_text, color=light_blue)
     y_text += 75
@@ -122,6 +131,8 @@ def create_trend01(*args, **kwargs):
     _ = _make_text(draw, text.aerodromes[0], text_font, y=y_text, color=light_blue)
     y_text += 75
     _ = _make_text(draw, text.aerodromes[1], text_font, y=y_text)
+    
+    return True
 
 
 @view_creator
@@ -130,6 +141,10 @@ def create_trend02(*args, **kwargs):
     title_font = kwargs.get("title_font")
     subtitle_font = kwargs.get("subtitle_font")
     text_font = kwargs.get("text_font")
+    docx = kwargs.get("docx")
+    
+    if docx is None:
+        return
     text = TrendText(kwargs.get("docx"))
     _make_title(draw, text.title, title_font)
     _make_subtitle(draw, text.subtitle, subtitle_font)
@@ -147,6 +162,8 @@ def create_trend02(*args, **kwargs):
     _make_text(draw, text.aerodromes[6], text_font, y=y_text, color=light_blue)
     y_text += 75
     _make_text(draw, text.aerodromes[7], text_font, y=y_text)
+    
+    return True
 
 
 ###########################################################################
@@ -162,17 +179,18 @@ def _paste_vash_img(
     found = False
     for fmt in [".png", ".jpg", ".gif", ".jpeg", ".bmp"]:
         try:
-            dist01 = Image.open(f"images/volcanoes/{dirname}/image{img_num}{fmt}")
-            dist01 = dist01.resize(img_size)
+            ash_img = Image.open(f"images/volcanoes/{dirname}/image{img_num}{fmt}")
         except FileNotFoundError:
             continue
         else:
-            img.paste(dist01, paste_pos)
+            ash_img = ash_img.resize(img_size)
+            img.paste(ash_img, paste_pos)
             found = True
             break
     
     if not found:
-        box("okcancel", "Faltan imágenes.", f"No se encuentra la imagen {img_num} del Volcán {name}.")
+        result = box("okcancel", "Faltan imágenes.", f"No se encuentra la imagen {img_num} del Volcán {name}.")
+    return found
 
 
 @view_creator
@@ -189,8 +207,15 @@ def create_volcanic_ash(*args, **kwargs):
     _make_subtitle(draw, f"Volcán {name}", subtitle_font)
     _make_text(draw, vash_text.format(tomorrow2str()), text_font)
 
-    _paste_vash_img(img, 1, name, dirname)
-    _paste_vash_img(img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700))
+    found = _paste_vash_img(img, 1, name, dirname)
+    if not found:
+        return
+    
+    found = _paste_vash_img(img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700))
+    if not found:
+        return
+    
+    return found
 
 
 ###########################################################################

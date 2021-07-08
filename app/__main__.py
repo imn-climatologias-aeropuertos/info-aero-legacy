@@ -2,6 +2,7 @@ import tkinter as tk
 from platform import system
 import os
 import glob
+import re
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -78,17 +79,13 @@ class App(tk.Tk):
             command=self.destroy,
         ).pack()
         
-        self._delete_volcanic_ash_images()
+        self._delete_images()
     
-    def _delete_volcanic_ash_images(self):
+    def _delete_images(self):
         for volcano in VOLCANOES:
             images = glob.glob(f"images/volcanoes/{volcano.dirname}/*")
             for img in images:
                 os.remove(img)
-
-    def _extract_images_from_docx(self):
-        for docx in self.header.docx_files[:-1]:
-            extract(docx)
 
     def _create_report(self):
         user = self.select_user.get_user()
@@ -96,12 +93,18 @@ class App(tk.Tk):
         try:
             map = self.header.sigwx_map
         except AttributeError:
-            box("error", "Error al abrir mapa SIGWX.", "No ha seleccionado el mapa de tiempo significante.")
+            result = box("okcancel", "Error al abrir mapa SIGWX.", "No ha seleccionado el mapa de tiempo significante. ¿Desea continuar?")
+            if not result:
+                return
+            map = None
         
         try:
             docx = self.header.get_docx_files("tendencia")
         except AttributeError:
-            box("error", "Error al abrir archivo .docx.", "No ha seleccionado el archivo de Tendencia de Aeropuertos.")
+            result = box("okcancel", "Error al abrir archivo .docx.", "No ha seleccionado el archivo de Tendencia de Aeropuertos. ¿Desea continuar?")
+            if not result:
+                return
+            docx = None
             
         
         data = {
@@ -124,16 +127,18 @@ class App(tk.Tk):
         create_trend02("03_trend.png", **data)
 
         # create volcanic ash forecast views
-        self._extract_images_from_docx()
+        extract(self.header.docx_files)
         img_num = 4
         for volcano in VOLCANOES:
-            create_volcanic_ash(
+            error = create_volcanic_ash(
                 f"0{img_num}_vash.png",
                 name=volcano.name,
                 dir=volcano.dirname,
                 **data
             )
             img_num += 1
+            if error:
+                return
         
         # create TAF view
         create_taf("07_taf.png", **data)
