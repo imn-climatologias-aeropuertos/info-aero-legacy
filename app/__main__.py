@@ -5,11 +5,13 @@ import glob
 import re
 
 from PIL import Image, ImageDraw, ImageFont
+import img2pdf
 
 from .__colors__ import light_blue, white
 from .__version__ import version
 from .frames import Climatology, Ephemeris, Header, SelectUser, box
 from .utils import VOLCANOES, extract
+from .utils import TODAY, date2str, MONTHS
 from .utils.create_view import (create_clima, create_map_img, create_taf, create_trend01,
                                 create_trend02, create_volcanic_ash,
                                 create_winds)
@@ -157,7 +159,28 @@ class App(tk.Tk):
         # create climatology view
         create_clima("09_clima.png", **data)
         
+        self._create_pdf()
+        
         box("showinfo", f"AeroInformes - {version}", "Informe creado correctamente.")
+    
+    def _create_pdf(self):
+        images = glob.glob("images/output/*")
+        user = self.select_user.get_user()
+        year = TODAY.year
+        month = MONTHS[TODAY.month]
+        
+        # create path if not exists
+        dirname = f"pdf/{year}/{month}"
+        if not os.path.exists(dirname):
+            os.makedirs(dirname)
+        
+        # create file path
+        date = date2str(include_weekday=False)
+        report_num = "N1" if TODAY.hour < 10 else "N2"
+        file_name = f"{dirname}/Informe Aeronautico {report_num} {date} {user.abbr}.pdf"
+        
+        with open(file_name, "wb") as f:
+            f.write(img2pdf.convert(sorted(images)))
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)

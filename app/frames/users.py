@@ -3,18 +3,19 @@ from tkinter import Entry, Frame, Label, Radiobutton, StringVar
 
 from ..__colors__ import blue, light_blue, white
 
-User = namedtuple("User", "name email value")
+User = namedtuple("User", "name email abbr value")
 
 USERS = [
     User(
         "Mónica Jiménez",
         "mjimenez",
+        "MJ",
         "0",
     ),
-    User("Karla Chaves", "kchaves", "1"),
-    User("Raquel Salazar", "rsalazar", "2"),
-    User("Felipe González", "fgonzalez", "3"),
-    User("Otro usuario", "", "4"),
+    User("Karla Chaves", "kchaves", "KC", "1"),
+    User("Raquel Salazar", "rsalazar", "RS", "2"),
+    User("Felipe González", "fgonzalez", "FG", "3"),
+    User("Otro usuario", "", "", "4"),
 ]
 
 
@@ -139,4 +140,7 @@ class SelectUser(Frame):
         if self.rbtn_value.get() in "0123":
             return USERS[user_index]
 
-        return User(*self.other_user.get_values(), "4")
+        # create other user and return
+        other_user = self.other_user.get_values()
+        other_abbr = "".join(el[0].upper() for el in other_user[0].split(" "))
+        return User(*self.other_user.get_values(), other_abbr, "4")

@@ -33,10 +33,11 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# Images/Trash directory
+# Images/Trash directory/PDF
 trash/
 trash/*/*.txt
 images/
+pdf/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template

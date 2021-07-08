@@ -12,6 +12,7 @@ suntime = "*"
 python-docx = "*"
 justifytext = "*"
 requests = "*"
+img2pdf = "*"
 
 [dev-packages]
 isort = "*"

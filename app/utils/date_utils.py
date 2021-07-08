@@ -28,12 +28,14 @@ MONTHS = {
 }
 
 
-def date2str(date=TODAY):
+def date2str(date=TODAY, include_weekday=True):
     weekday = DAYS[date.weekday()]
     day = date.day
     month = MONTHS[date.month]
     year = date.year
-    return "{} {} de {} de {}".format(weekday, day, month, year)
+    if include_weekday:
+        return "{} {:02d} de {} de {}".format(weekday, day, month, year)
+    return "{:02d} de {} de {}".format(day, month, year)
 
 
 def tomorrow2str(days=1):
