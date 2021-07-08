@@ -8,6 +8,7 @@ from docx import Document
 from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
 from requests import get
+from requests.exceptions import ConnectionError
 
 from ..__colors__ import blue, grey, light_blue, white
 from .date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
@@ -29,9 +30,11 @@ def view_creator(func):
         draw = ImageDraw.Draw(img)
         # img, draw = func(img=img, draw=draw, **kwargs)
         result = func(img=img, draw=draw, **kwargs)
-        if result:
+        if result == "ok":
             img = img.resize((1200, 900))
             img.save("images/output/" + args[0])
+            return False
+        elif result == "no":
             return False
         return True
 
@@ -85,7 +88,7 @@ def create_map_img(*args, **kwargs):
     map_img = map_img.resize((2000, 1294))
     img.paste(map_img, (200, 335))
     
-    return True
+    return "ok"
 
 
 ###########################################################################
@@ -132,7 +135,7 @@ def create_trend01(*args, **kwargs):
     y_text += 75
     _ = _make_text(draw, text.aerodromes[1], text_font, y=y_text)
     
-    return True
+    return "ok"
 
 
 @view_creator
@@ -163,7 +166,7 @@ def create_trend02(*args, **kwargs):
     y_text += 75
     _make_text(draw, text.aerodromes[7], text_font, y=y_text)
     
-    return True
+    return "ok"
 
 
 ###########################################################################
@@ -189,8 +192,7 @@ def _paste_vash_img(
             break
     
     if not found:
-        result = box("okcancel", "Faltan imágenes.", f"No se encuentra la imagen {img_num} del Volcán {name}.")
-    return found
+        raise FileNotFoundError(f"No se encuentra la imagen {img_num} del Volcán {name.title()}.")
 
 
 @view_creator
@@ -207,15 +209,32 @@ def create_volcanic_ash(*args, **kwargs):
     _make_subtitle(draw, f"Volcán {name}", subtitle_font)
     _make_text(draw, vash_text.format(tomorrow2str()), text_font)
 
-    found = _paste_vash_img(img, 1, name, dirname)
-    if not found:
-        return
+    box_params = ["okcancel", "Faltan imágenes."]
+    with_errors = False
+    try:
+        _paste_vash_img(img, 1, name, dirname)
+    except FileNotFoundError as e:
+        result = box(*box_params, e)
+        if result:
+            with_errors = True
+        else:
+            return
     
-    found = _paste_vash_img(img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700))
-    if not found:
-        return
+    try:
+        _paste_vash_img(img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700))
+    except FileNotFoundError as e:
+        result = box(*box_params, e)
+        if result:
+            with_errors = True
+        else:
+            return
     
-    return found
+    if with_errors:
+        result = box("okcancel", "Imagen con errores.", "¿Desea guardar la imagen para este volcán?")
+        if result:
+            return "ok"
+        return "no"
+    return "ok"
 
 
 ###########################################################################
@@ -244,19 +263,34 @@ def create_taf(*args, **kwargs):
     _make_subtitle(draw, subtitle, text_font, x=330, y=280)
 
     y_text = 420
+    with_errors = False
     for stn in ["MROC", "MRLB", "MRLM", "MRPV"]:
         url = BASE_TAF_URL.format(stn)
-        res = get(url)
-        taf = res.text.split("\n")
-        # COMMENT IF USE NOAA's URL
-        taf = taf[6].split(",")
-        taf = TAF(taf[0])
-        pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
-        # COMMENT IF USE AVIATIONWEATHER's URL
-        # taf = taf[1:-1]
-        # taf = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", "\n".join(taf))
-        # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
-        y_text += pxls + 35
+        try:
+            res = get(url)
+        except ConnectionError as e:
+            result = box("okcancel", f"Error de conexión.", f"No se puede conectar la petición del TAF {stn}. ¿Desea continuar?")
+            if not result:
+                with_errors = True
+                return
+            continue
+        else:
+            taf = res.text.split("\n")
+            # COMMENT IF USE NOAA's URL
+            taf = taf[6].split(",")
+            taf = TAF(taf[0])
+            pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
+            # COMMENT IF USE AVIATIONWEATHER's URL
+            # taf = taf[1:-1]
+            # taf = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", "\n".join(taf))
+            # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
+            y_text += pxls + 35
+    
+    if with_errors:
+        result = box("okcancel", f"Errores en TAF.", "¿Desea guardar la imagen?")
+        if not result:
+            return "no"
+    return "ok"
 
 
 ###########################################################################
@@ -363,11 +397,17 @@ def _get_winds_data():
     for stn in ["MROC", "MRLB", "MRLM", "MRPV"]:
         u_url = BASE_WINDS_U_URL.format(stn)
         v_url = BASE_WINDS_V_URL.format(stn)
-        u_res = get(u_url)
-        v_res = get(v_url)
-        u, v = _process_response(u_res, v_res)
-
-        winds[stn] = Wind(u, v)
+        try:
+            u_res = get(u_url)
+            v_res = get(v_url)
+        except ConnectionError as e:
+            result = box("okcancel", f"Error de conexión.", f"No se puede conectar la petición de los datos de vientos en altura de {stn}. ¿Desea continuar?")
+            if not result:
+                raise
+            continue
+        else:
+            u, v = _process_response(u_res, v_res)
+            winds[stn] = Wind(u, v)
     
     return winds
 
@@ -400,6 +440,12 @@ def create_winds(*args, **kwargs):
     subtitle_font = kwargs.get("subtitle_font")
     text_font = kwargs.get("text_font")
     table_font = kwargs.get("table_font")
+    
+    # get the winds from internet
+    try:
+        winds = _get_winds_data()
+    except ConnectionError:
+        return
 
     _make_title(draw, "Vientos en Altura", title_font)
     _make_subtitle(draw, "Dirección y Velocidad (kt)", subtitle_font)
@@ -409,8 +455,9 @@ def create_winds(*args, **kwargs):
 
     _draw_winds_table(draw)
     _write_winds_table_text(draw, table_font)
-    winds = _get_winds_data()
     _write_winds_on_table(draw, winds, title_font, table_font)
+    
+    return "ok"
 
 
 ###########################################################################
@@ -514,3 +561,5 @@ def create_clima(*args, **kwargs):
     _write_clima_table_text(draw, text_font, table_font, clima)
     _write_ephemeris(img, draw, subtitle_font, text_font, data=ephemeris)
     _write_user_data(draw, text_font, data=user)
+    
+    return "ok"

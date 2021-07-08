@@ -82,6 +82,10 @@ class App(tk.Tk):
         self._delete_images()
     
     def _delete_images(self):
+        images = glob.glob("images/output/*")
+        for img in images:
+            os.remove(img)
+        
         for volcano in VOLCANOES:
             images = glob.glob(f"images/volcanoes/{volcano.dirname}/*")
             for img in images:
@@ -141,15 +145,19 @@ class App(tk.Tk):
                 return
         
         # create TAF view
-        create_taf("07_taf.png", **data)
+        error = create_taf("07_taf.png", **data)
+        if error:
+            return
         
         # create winds view
-        create_winds("08_winds.png", **data)
+        error = create_winds("08_winds.png", **data)
+        if error:
+            return
         
         # create climatology view
         create_clima("09_clima.png", **data)
         
-        box("showinfo", f"AeroInformes - {version}", "Carpeta creada correctamente.")
+        box("showinfo", f"AeroInformes - {version}", "Informe creado correctamente.")
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)
