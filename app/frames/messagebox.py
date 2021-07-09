@@ -1,5 +1,6 @@
 from tkinter import messagebox as MessageBox
 
+
 def box(type: str, title: str, message: str):
     if type == "warning":
         MessageBox.showwarning(title, message)

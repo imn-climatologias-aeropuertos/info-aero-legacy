@@ -1,7 +1,5 @@
 import os
 import re
-from datetime import datetime, timedelta
-from textwrap import fill
 from typing import List
 
 from docx import Document
@@ -10,12 +8,13 @@ from PIL import Image, ImageDraw, ImageFont
 from requests import get
 from requests.exceptions import ConnectionError
 
+from app.frames.clima import Station
+from app.frames.messagebox import box
+
 from ..__colors__ import blue, grey, light_blue, white
 from .date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
 from .taf_model import TAF
 from .winds_model import Wind
-from app.frames.clima import Station
-from app.frames.messagebox import box
 
 
 def view_creator(func):
@@ -41,7 +40,9 @@ def view_creator(func):
     return wrapper
 
 
-def _make_title(draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90, color=light_blue):
+def _make_title(
+    draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90, color=light_blue
+):
     text = text.center(46, " ")
     draw.text((x, y), text, font=font, fill=color)
 
@@ -69,9 +70,11 @@ def _make_text(
 
     return len(ltext * 50)
 
+
 ###########################################################################
 ############################## CREATE MAP VIEW ############################
 ###########################################################################
+
 
 @view_creator
 def create_map_img(*args, **kwargs):
@@ -87,13 +90,14 @@ def create_map_img(*args, **kwargs):
     map_img = Image.open(map_img_path)
     map_img = map_img.resize((2000, 1294))
     img.paste(map_img, (200, 335))
-    
+
     return "ok"
 
 
 ###########################################################################
 ############################# CREATE TREND VIEW ###########################
 ###########################################################################
+
 
 class TrendText:
     def __init__(self, path):
@@ -125,7 +129,7 @@ def create_trend01(*args, **kwargs):
     _make_title(draw, text.title, title_font)
     _make_subtitle(draw, text.subtitle, subtitle_font)
     _ = _make_text(draw, text.valid, text_font, x=700)
-    
+
     y_text = 500
     _ = _make_text(draw, text.general[0], text_font, y=y_text, color=light_blue)
     y_text += 75
@@ -134,7 +138,7 @@ def create_trend01(*args, **kwargs):
     _ = _make_text(draw, text.aerodromes[0], text_font, y=y_text, color=light_blue)
     y_text += 75
     _ = _make_text(draw, text.aerodromes[1], text_font, y=y_text)
-    
+
     return "ok"
 
 
@@ -145,7 +149,7 @@ def create_trend02(*args, **kwargs):
     subtitle_font = kwargs.get("subtitle_font")
     text_font = kwargs.get("text_font")
     docx = kwargs.get("docx")
-    
+
     if docx is None:
         return
     text = TrendText(kwargs.get("docx"))
@@ -165,7 +169,7 @@ def create_trend02(*args, **kwargs):
     _make_text(draw, text.aerodromes[6], text_font, y=y_text, color=light_blue)
     y_text += 75
     _make_text(draw, text.aerodromes[7], text_font, y=y_text)
-    
+
     return "ok"
 
 
@@ -177,7 +181,12 @@ vash_text = "Modelos de dispersión de ceniza volcánica, validez hasta las 12:0
 
 
 def _paste_vash_img(
-    img: Image, img_num: int, name: str, dirname: str, img_size=(850, 1055), paste_pos=(350, 550)
+    img: Image,
+    img_num: int,
+    name: str,
+    dirname: str,
+    img_size=(850, 1055),
+    paste_pos=(350, 550),
 ):
     found = False
     for fmt in [".png", ".jpg", ".gif", ".jpeg", ".bmp"]:
@@ -190,9 +199,11 @@ def _paste_vash_img(
             img.paste(ash_img, paste_pos)
             found = True
             break
-    
+
     if not found:
-        raise FileNotFoundError(f"No se encuentra la imagen {img_num} del Volcán {name.title()}.")
+        raise FileNotFoundError(
+            f"No se encuentra la imagen {img_num} del Volcán {name.title()}."
+        )
 
 
 @view_creator
@@ -219,18 +230,24 @@ def create_volcanic_ash(*args, **kwargs):
             with_errors = True
         else:
             return
-    
+
     try:
-        _paste_vash_img(img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700))
+        _paste_vash_img(
+            img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700)
+        )
     except FileNotFoundError as e:
         result = box(*box_params, e)
         if result:
             with_errors = True
         else:
             return
-    
+
     if with_errors:
-        result = box("okcancel", "Imagen con errores.", "¿Desea guardar la imagen para este volcán?")
+        result = box(
+            "okcancel",
+            "Imagen con errores.",
+            "¿Desea guardar la imagen para este volcán?",
+        )
         if result:
             return "ok"
         return "no"
@@ -269,7 +286,11 @@ def create_taf(*args, **kwargs):
         try:
             res = get(url)
         except ConnectionError as e:
-            result = box("okcancel", f"Error de conexión.", f"No se puede conectar la petición del TAF {stn}. ¿Desea continuar?")
+            result = box(
+                "okcancel",
+                f"Error de conexión.",
+                f"No se puede conectar la petición del TAF {stn}. ¿Desea continuar?",
+            )
             if not result:
                 with_errors = True
                 return
@@ -279,13 +300,15 @@ def create_taf(*args, **kwargs):
             # COMMENT IF USE NOAA's URL
             taf = taf[6].split(",")
             taf = TAF(taf[0])
-            pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
+            pxls = _make_text(
+                draw, taf.formated, text_font, x=100, y=y_text, just=False
+            )
             # COMMENT IF USE AVIATIONWEATHER's URL
             # taf = taf[1:-1]
             # taf = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", "\n".join(taf))
             # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
             y_text += pxls + 35
-    
+
     if with_errors:
         result = box("okcancel", f"Errores en TAF.", "¿Desea guardar la imagen?")
         if not result:
@@ -296,6 +319,7 @@ def create_taf(*args, **kwargs):
 ###########################################################################
 ############################# CREATE WINDS VIEW ###########################
 ###########################################################################
+
 
 def _draw_winds_table(draw: ImageDraw.Draw):
     # light blue rectangle
@@ -365,27 +389,34 @@ def _write_winds_table_text(draw: ImageDraw.Draw, font: ImageFont):
         draw.text((170, y_top), level, font=font, fill=blue)
         y_top += 151
 
-BASE_WINDS_U_URL = "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_U.txt"
-BASE_WINDS_V_URL = "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_V.txt"
+
+BASE_WINDS_U_URL = (
+    "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_U.txt"
+)
+BASE_WINDS_V_URL = (
+    "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_V.txt"
+)
+
 
 def _sanitize_str(s):
     s = re.sub(r"\s{2,}", " ", s)
     s = s.strip()
-    
+
     return s
+
 
 def _process_response(u_text, v_text):
     indexes = (6, 9)
     u_temp = u_text.text.split("\n")
-    u_temp = [u_temp[indexes[0]]] + u_temp[indexes[1]:-1]
+    u_temp = [u_temp[indexes[0]]] + u_temp[indexes[1] : -1]
     v_temp = v_text.text.split("\n")
-    v_temp = [v_temp[indexes[0]]] + v_temp[indexes[1]:-1]
-    
+    v_temp = [v_temp[indexes[0]]] + v_temp[indexes[1] : -1]
+
     u, v = [], []
     for u_el, v_el in zip(u_temp, v_temp):
         u_el = _sanitize_str(u_el)
         v_el = _sanitize_str(v_el)
-        
+
         u.append(u_el.upper())
         v.append(v_el.upper())
 
@@ -401,37 +432,53 @@ def _get_winds_data():
             u_res = get(u_url)
             v_res = get(v_url)
         except ConnectionError as e:
-            result = box("okcancel", f"Error de conexión.", f"No se puede conectar la petición de los datos de vientos en altura de {stn}. ¿Desea continuar?")
+            result = box(
+                "okcancel",
+                f"Error de conexión.",
+                f"No se puede conectar la petición de los datos de vientos en altura de {stn}. ¿Desea continuar?",
+            )
             if not result:
                 raise
             continue
         else:
             u, v = _process_response(u_res, v_res)
             winds[stn] = Wind(u, v)
-    
+
     return winds
 
 
-def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict, title_font: ImageFont, text_font: ImageFont):
+def _write_winds_on_table(
+    draw: ImageDraw.Draw, winds: dict, title_font: ImageFont, text_font: ImageFont
+):
     x = 400
     y = 450
     for stn, wind in winds.items():
         date = TODAY
-        _make_text(draw, stn, title_font, x=x+130, y=y, color=white)
+        _make_text(draw, stn, title_font, x=x + 130, y=y, color=white)
         _x = 25
         for time in wind.hours:
             _y = 120
-            _make_text(draw, "{:02d}".format(date.day), text_font, x=x+_x+10, y=y+_y, color=white)
+            _make_text(
+                draw,
+                "{:02d}".format(date.day),
+                text_font,
+                x=x + _x + 10,
+                y=y + _y,
+                color=white,
+            )
             _y += 75
-            _make_text(draw, time, text_font, x=x+_x, y=y+_y, color=white)
+            _make_text(draw, time, text_font, x=x + _x, y=y + _y, color=white)
             _y += 85
             for level in [300, 400, 500, 700, 850, 925]:
                 text = wind.values(time, level)
-                _make_text(draw, text, text_font, x=x+_x, y=y+_y, color=blue, just=False)
+                _make_text(
+                    draw, text, text_font, x=x + _x, y=y + _y, color=blue, just=False
+                )
                 _y += 151
             _x += 113
             date = TOMORROW
         x += 450
+
 
 @view_creator
 def create_winds(*args, **kwargs):
@@ -440,7 +487,7 @@ def create_winds(*args, **kwargs):
     subtitle_font = kwargs.get("subtitle_font")
     text_font = kwargs.get("text_font")
     table_font = kwargs.get("table_font")
-    
+
     # get the winds from internet
     try:
         winds = _get_winds_data()
@@ -450,13 +497,17 @@ def create_winds(*args, **kwargs):
     _make_title(draw, "Vientos en Altura", title_font)
     _make_subtitle(draw, "Dirección y Velocidad (kt)", subtitle_font)
     _make_text(
-        draw, f"Válido hasta las {'12'}:00Z del {tomorrow2str()}", text_font, x=400, y=345
+        draw,
+        f"Válido hasta las {'12'}:00Z del {tomorrow2str()}",
+        text_font,
+        x=400,
+        y=345,
     )
 
     _draw_winds_table(draw)
     _write_winds_table_text(draw, table_font)
     _write_winds_on_table(draw, winds, title_font, table_font)
-    
+
     return "ok"
 
 
@@ -464,9 +515,10 @@ def create_winds(*args, **kwargs):
 ############################# CREATE CLIMA VIEW ###########################
 ###########################################################################
 
+
 def _draw_clima_table(draw: ImageDraw.Draw):
     draw.rectangle((200, 350, 2200, 550), fill=light_blue)
-    
+
     # draw vertical lines
     x_left = 200
     for i in range(5):
@@ -474,7 +526,7 @@ def _draw_clima_table(draw: ImageDraw.Draw):
             x_left += 200
         draw.line((x_left, 350, x_left, 950), fill=blue, width=5)
         x_left += 450
-    
+
     # draw horizontal lines
     x_left = 198
     y_top = 350
@@ -485,9 +537,19 @@ def _draw_clima_table(draw: ImageDraw.Draw):
         y_top += 100
 
 
-def _write_clima_table_text(draw: ImageDraw.Draw, title_font: ImageFont, text_font: ImageFont, clima: List[Station]):
-    titles = ["  Estación   \nMeteorológica", "  T. Máxima  \n     (°)     ", "  T. Mínima  \n     (°)     ", "Precipitación\n    (mm)     "]
-    
+def _write_clima_table_text(
+    draw: ImageDraw.Draw,
+    title_font: ImageFont,
+    text_font: ImageFont,
+    clima: List[Station],
+):
+    titles = [
+        "  Estación   \nMeteorológica",
+        "  T. Máxima  \n     (°)     ",
+        "  T. Mínima  \n     (°)     ",
+        "Precipitación\n    (mm)     ",
+    ]
+
     x_left = 340
     for title in titles:
         if titles.index(title) == 1:
@@ -496,38 +558,85 @@ def _write_clima_table_text(draw: ImageDraw.Draw, title_font: ImageFont, text_fo
             x_left += 10
         _make_text(draw, title, title_font, color=white, x=x_left, y=390, just=False)
         x_left += 450
-    
+
     y_top = 575
-    stations = ["Juan Santamaría (MROC)", "Daniel Oduber (MRLB)", "Limón (MRLM)", "Tobías Bolaños (MRPV)"]
+    stations = [
+        "Juan Santamaría (MROC)",
+        "Daniel Oduber (MRLB)",
+        "Limón (MRLM)",
+        "Tobías Bolaños (MRPV)",
+    ]
     for stn in stations:
         stn = stn.center(25, " ")
         _make_text(draw, stn, text_font, color=blue, x=220, y=y_top, just=False)
         y_top += 100
-    
+
     x_left = 1010
     y_top = 575
     for stn in clima:
         tmax, tmin, prec = stn.get_values()
-        _make_text(draw, tmax.center(5, " "), text_font, x=x_left, y=y_top, just=False, color=blue)
-        _make_text(draw, tmin.center(5, " "), text_font, x=x_left+450, y=y_top, just=False, color=blue)
-        _make_text(draw, prec.center(5, " "), text_font, x=x_left+900, y=y_top, just=False, color=blue)
+        _make_text(
+            draw,
+            tmax.center(5, " "),
+            text_font,
+            x=x_left,
+            y=y_top,
+            just=False,
+            color=blue,
+        )
+        _make_text(
+            draw,
+            tmin.center(5, " "),
+            text_font,
+            x=x_left + 450,
+            y=y_top,
+            just=False,
+            color=blue,
+        )
+        _make_text(
+            draw,
+            prec.center(5, " "),
+            text_font,
+            x=x_left + 900,
+            y=y_top,
+            just=False,
+            color=blue,
+        )
         y_top += 100
 
-def _write_ephemeris(img: Image, draw: ImageDraw.Draw, title_font: ImageFont, text_font: ImageFont, data=("00:00 AM", "00:00 AM")):
-    _make_text(draw, "Salida y Puesta del Sol", title_font, color=blue, just=False, x=250, y=1000)
-    _make_text(draw, "Salida de mañana", text_font, color=blue, just=False, x=250, y=1100)
+
+def _write_ephemeris(
+    img: Image,
+    draw: ImageDraw.Draw,
+    title_font: ImageFont,
+    text_font: ImageFont,
+    data=("00:00 AM", "00:00 AM"),
+):
+    _make_text(
+        draw,
+        "Salida y Puesta del Sol",
+        title_font,
+        color=blue,
+        just=False,
+        x=250,
+        y=1000,
+    )
+    _make_text(
+        draw, "Salida de mañana", text_font, color=blue, just=False, x=250, y=1100
+    )
     _make_text(draw, "Puesta de hoy", text_font, color=blue, just=False, x=775, y=1100)
-    
+
     sunrise = Image.open("assets/img/sunrise.png")
     sunset = Image.open("assets/img/sunset.png")
     img.paste(sunrise, (250, 1180))
     img.paste(sunset, (735, 1180))
-    
+
     draw.rectangle((250, 1500, 1200, 1600), fill=light_blue)
     x_left = 370
     for d in data:
         _make_text(draw, d, text_font, color=white, x=x_left, y=1525)
         x_left += 500
+
 
 def _write_user_data(draw: ImageDraw.Draw, font, data=("Name", "email@email.com")):
     text = "{}\n{}\n{}\n{}@imn.ac.cr\n{}".format(
@@ -535,10 +644,11 @@ def _write_user_data(draw: ImageDraw.Draw, font, data=("Name", "email@email.com"
         "Meteorología Aeronáutica (IMN)",
         "Aeropuerto Int. Tobías Bolaños",
         data[1],
-        "Telefax: (+506) 2232-2071\nWeb (IMN): www.imn.ac.cr"
+        "Telefax: (+506) 2232-2071\nWeb (IMN): www.imn.ac.cr",
     )
-    
+
     _make_text(draw, text.strip(), font, color=blue, x=1280, y=1200, just=False)
+
 
 @view_creator
 def create_clima(*args, **kwargs):
@@ -551,15 +661,15 @@ def create_clima(*args, **kwargs):
     clima = kwargs.get("clima")
     ephemeris = kwargs.get("ephemeris")
     user = kwargs.get("user")
-    
+
     yesterday = date2str(date=YESTERDAY)
-    
+
     _make_title(draw, "Datos Climatológicos", title_font)
     _make_subtitle(draw, yesterday.capitalize(), subtitle_font)
-    
+
     _draw_clima_table(draw)
     _write_clima_table_text(draw, text_font, table_font, clima)
     _write_ephemeris(img, draw, subtitle_font, text_font, data=ephemeris)
     _write_user_data(draw, text_font, data=user)
-    
+
     return "ok"

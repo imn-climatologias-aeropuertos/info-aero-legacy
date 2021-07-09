@@ -1,6 +1,6 @@
+import re
 from tkinter import Button, Frame, Label
 from tkinter import filedialog as fd
-import re
 
 from PIL import Image, ImageTk
 
@@ -53,10 +53,10 @@ class Header(Frame):
         if dtype == "tendencia":
             for i in range(len(l)):
                 result = re.search(r"[Tt]enden[cs]ia", l[i])
-                
+
                 if result:
                     return l[i]
-            
+
             raise AttributeError("trend file not found.")
         return l[:3]
 

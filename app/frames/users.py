@@ -1,3 +1,4 @@
+import re
 from collections import namedtuple
 from tkinter import Entry, Frame, Label, Radiobutton, StringVar
 
@@ -142,5 +143,9 @@ class SelectUser(Frame):
 
         # create other user and return
         other_user = self.other_user.get_values()
+        if len(other_user[1]) == 0:
+            raise IndexError
+        other_user = list(other_user)
+        other_user[1] = re.sub(r"@.+", "", other_user[1])
         other_abbr = "".join(el[0].upper() for el in other_user[0].split(" "))
-        return User(*self.other_user.get_values(), other_abbr, "4")
+        return User(*other_user, other_abbr, "4")

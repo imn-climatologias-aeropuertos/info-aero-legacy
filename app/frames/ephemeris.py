@@ -1,4 +1,3 @@
-from datetime import datetime
 from tkinter import Entry, Frame, Label
 
 from dateutil import tz

@@ -1,20 +1,25 @@
+import glob
+import os
+import re
 import tkinter as tk
 from platform import system
-import os
-import glob
-import re
 
-from PIL import Image, ImageDraw, ImageFont
 import img2pdf
+from PIL import ImageFont
 
 from .__colors__ import light_blue, white
 from .__version__ import version
 from .frames import Climatology, Ephemeris, Header, SelectUser, box
-from .utils import VOLCANOES, extract
-from .utils import TODAY, date2str, MONTHS
-from .utils.create_view import (create_clima, create_map_img, create_taf, create_trend01,
-                                create_trend02, create_volcanic_ash,
-                                create_winds)
+from .utils import MONTHS, TODAY, VOLCANOES, date2str, extract
+from .utils.create_view import (
+    create_clima,
+    create_map_img,
+    create_taf,
+    create_trend01,
+    create_trend02,
+    create_volcanic_ash,
+    create_winds,
+)
 
 
 class App(tk.Tk):
@@ -80,54 +85,69 @@ class App(tk.Tk):
             bg=light_blue,
             command=self.destroy,
         ).pack()
-        
+
         self._delete_images()
-    
+
     def _delete_images(self):
         images = glob.glob("images/output/*")
         for img in images:
             os.remove(img)
-        
+
         for volcano in VOLCANOES:
             images = glob.glob(f"images/volcanoes/{volcano.dirname}/*")
             for img in images:
                 os.remove(img)
 
     def _create_report(self):
-        user = self.select_user.get_user()
-        
+        try:
+            user = self.select_user.get_user()
+        except IndexError:
+            box(
+                "error",
+                "Error al procesar usuario.",
+                "Seleccionó otro usuario, pero no escribió su nombre y/o usuario de correo institucional.",
+            )
+            return
+
         try:
             map = self.header.sigwx_map
         except AttributeError:
-            result = box("okcancel", "Error al abrir mapa SIGWX.", "No ha seleccionado el mapa de tiempo significante. ¿Desea continuar?")
+            result = box(
+                "okcancel",
+                "Error al abrir mapa SIGWX.",
+                "No ha seleccionado el mapa de tiempo significante. ¿Desea continuar?",
+            )
             if not result:
                 return
             map = None
-        
+
         try:
             docx = self.header.get_docx_files("tendencia")
         except AttributeError:
-            result = box("okcancel", "Error al abrir archivo .docx.", "No ha seleccionado el archivo de Tendencia de Aeropuertos. ¿Desea continuar?")
+            result = box(
+                "okcancel",
+                "Error al abrir archivo .docx.",
+                "No ha seleccionado el archivo de Tendencia de Aeropuertos. ¿Desea continuar?",
+            )
             if not result:
                 return
             docx = None
-            
-        
+
         data = {
-            "title_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 86),
-            "subtitle_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 68),
-            "text_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 48),
-            "table_font": ImageFont.truetype("assets/fonts/JetBrainsMono-Regular.ttf", 40),
+            "title_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 86),
+            "subtitle_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 68),
+            "text_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 48),
+            "table_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 40),
             "map": map,
             "docx": docx,
             "clima": self.clima.stations,
             "ephemeris": self.ephemeris.get_ephemeris_time(),
             "user": (user.name, user.email),
         }
-        
+
         # create map view
         create_map_img("01_map.png", **data)
-        
+
         # create aerodromes trend views
         create_trend01("02_trend.png", **data)
         create_trend02("03_trend.png", **data)
@@ -137,48 +157,46 @@ class App(tk.Tk):
         img_num = 4
         for volcano in VOLCANOES:
             error = create_volcanic_ash(
-                f"0{img_num}_vash.png",
-                name=volcano.name,
-                dir=volcano.dirname,
-                **data
+                f"0{img_num}_vash.png", name=volcano.name, dir=volcano.dirname, **data
             )
             img_num += 1
             if error:
                 return
-        
+
         # create TAF view
         error = create_taf("07_taf.png", **data)
         if error:
             return
-        
+
         # create winds view
         error = create_winds("08_winds.png", **data)
         if error:
             return
-        
+
         # create climatology view
         create_clima("09_clima.png", **data)
-        
+
+        # create pdf file
         self._create_pdf()
-        
+
         box("showinfo", f"AeroInformes - {version}", "Informe creado correctamente.")
-    
+
     def _create_pdf(self):
         images = glob.glob("images/output/*")
         user = self.select_user.get_user()
         year = TODAY.year
         month = MONTHS[TODAY.month]
-        
+
         # create path if not exists
         dirname = f"pdf/{year}/{month}"
         if not os.path.exists(dirname):
             os.makedirs(dirname)
-        
+
         # create file path
         date = date2str(include_weekday=False)
         report_num = "N1" if TODAY.hour < 10 else "N2"
         file_name = f"{dirname}/Informe Aeronautico {report_num} {date} {user.abbr}.pdf"
-        
+
         with open(file_name, "wb") as f:
             f.write(img2pdf.convert(sorted(images)))
 

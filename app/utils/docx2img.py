@@ -17,7 +17,7 @@ VOLCANOES = [
 def extract(docx_list):
     if len(docx_list) == 0:
         return
-    
+
     for f in docx_list:
         for volcano in VOLCANOES:
             match = re.search(volcano.regex, f)

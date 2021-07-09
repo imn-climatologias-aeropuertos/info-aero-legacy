@@ -1,4 +1,4 @@
-from tkinter import Button, Entry, Frame, Label
+from tkinter import Entry, Frame, Label
 
 from ..__colors__ import blue, light_blue, white
 
