@@ -18,6 +18,7 @@ img2pdf = "*"
 isort = "*"
 black = "==21.6b0"
 bump2version = "*"
+pyinstaller = "*"
 
 [requires]
 python_version = "3.9"
