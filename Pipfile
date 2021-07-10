@@ -13,6 +13,8 @@ python-docx = "*"
 justifytext = "*"
 requests = "*"
 img2pdf = "*"
+pytz = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 isort = "*"

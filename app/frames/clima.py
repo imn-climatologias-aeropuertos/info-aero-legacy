@@ -1,6 +1,6 @@
 from tkinter import Entry, Frame, Label
 
-from ..__colors__ import blue, light_blue, white
+from app.__colors__ import blue, light_blue, white
 
 
 class Station(Frame):

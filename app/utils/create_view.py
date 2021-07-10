@@ -2,6 +2,8 @@ import os
 import re
 from typing import List
 
+import pytz
+from bs4 import BeautifulSoup
 from docx import Document
 from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
@@ -11,10 +13,10 @@ from requests.exceptions import ConnectionError
 from app.frames.clima import Station
 from app.frames.messagebox import box
 
-from ..__colors__ import blue, grey, light_blue, white
-from .date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
-from .taf_model import TAF
-from .winds_model import Wind
+from app.__colors__ import blue, grey, light_blue, white
+from app.utils.date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
+from app.utils.taf_model import TAF
+from app.utils.winds_model import Wind
 
 
 def view_creator(func):
@@ -83,9 +85,12 @@ def create_map_img(*args, **kwargs):
     draw = kwargs.get("draw")
     title_font = kwargs.get("title_font")
     subtitle_font = kwargs.get("subtitle_font")
+    text_font = kwargs.get("text_font")
 
     _make_title(draw, "Meteorología Aeronáutica", title_font)
     _make_subtitle(draw, date2str().capitalize(), subtitle_font)
+    if TODAY.hour >= 11:
+        _make_text(draw, "ACTUALIZADO", text_font, x=210, y=270, color=blue)
 
     map_img = Image.open(map_img_path)
     map_img = map_img.resize((2000, 1294))
@@ -258,9 +263,49 @@ def create_volcanic_ash(*args, **kwargs):
 ############################## CREATE TAF VIEW ############################
 ###########################################################################
 
-# BASE_TAF_URL = "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{}.TXT"
-BASE_TAF_URL = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=1"
+#BASE_URL_ADDS = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=0"
+# BASE_URL_NOAA = "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{}.TXT"
 
+BASE_URL_OGIMET = "http://ogimet.com/display_metars2.php?lugar=MROC+MRLB+MRLM+MRPV&tipo=FT&ord=REV&nil=NO&fmt=txt&ano={}&mes={:02d}&day={:02d}&hora={:02d}&anof={}&mesf={:02d}&dayf={:02d}&horaf={:02d}&minf=59&enviar=Ver"
+
+def _process_ogimet_taf(taf: List[str]):
+    first_line = taf[0] + " " + taf[1]
+    
+    return " ".join([first_line] + taf[2:] if len(taf) > 2 else [first_line])
+
+def _taf_from_ogimet():
+    UTC = pytz.utc
+    tafs = []
+    yestarday = YESTERDAY.astimezone(tz=UTC)
+    today = TODAY.astimezone(tz=UTC)
+    url = BASE_URL_OGIMET.format(yestarday.year, yestarday.month, yestarday.day, yestarday.hour, today.year, today.month, today.day, today.hour)
+    
+    res = get(url)
+    taf_found = False
+    taf = []
+    for line in res.text.split("\n"):
+        if taf_found and not line.startswith("#"):
+            taf.append(line.strip())
+            if line.endswith("="):
+                taf_found = False
+                tafs.append(_process_ogimet_taf(taf))
+                taf = []
+        if re.match(r"#\s+TAF\s+LARGOS", line):
+            taf_found = True
+    
+    return tafs
+
+BASE_URL_ADDS = "https://www.aviationweather.gov/taf/data?ids=MROC+MRLB+MRLM+MRPV&format=raw&date=&submit=Get+TAF+data"
+
+def _taf_from_adds():
+    tafs = []
+    res = get(BASE_URL_ADDS)
+    soup = BeautifulSoup(res.text, "html.parser")
+    
+    for taf in soup.find_all("code"):
+        tafs.append(taf.getText())
+    
+    return tafs
 
 @view_creator
 def create_taf(*args, **kwargs):
@@ -275,46 +320,34 @@ def create_taf(*args, **kwargs):
         subtitle = subtitle.format("00", tomorrow2str(days=2))
     elif TODAY.hour >= 11:
         subtitle = subtitle.format("18", tomorrow2str())
-    else:
+    elif TODAY.hour >= 5:
         subtitle = subtitle.format("12", tomorrow2str())
+    else:
+        subtitle = subtitle.format("06", tomorrow2str())
     _make_subtitle(draw, subtitle, text_font, x=330, y=280)
-
-    y_text = 420
+    
     with_errors = False
-    for stn in ["MROC", "MRLB", "MRLM", "MRPV"]:
-        url = BASE_TAF_URL.format(stn)
+    try:
+        tafs = _taf_from_adds()
+    except ConnectionError:
         try:
-            res = get(url)
-        except ConnectionError as e:
-            result = box(
-                "okcancel",
-                f"Error de conexión.",
-                f"No se puede conectar la petición del TAF {stn}. ¿Desea continuar?",
-            )
-            if not result:
+            tafs = _taf_from_ogimet()
+        except ConnectionError:
+            result = box("okcancel", "Error de conexión.", "No se puede acceder a los TAF. ¿Desea continuar? Se omitirá esta imagen.")
+            if result:
                 with_errors = True
+            else:
                 return
-            continue
-        else:
-            taf = res.text.split("\n")
-            # COMMENT IF USE NOAA's URL
-            taf = taf[6].split(",")
-            taf = TAF(taf[0])
-            pxls = _make_text(
-                draw, taf.formated, text_font, x=100, y=y_text, just=False
-            )
-            # COMMENT IF USE AVIATIONWEATHER's URL
-            # taf = taf[1:-1]
-            # taf = re.sub(r"TAF\s+|COR\s+|AMD\s+", "", "\n".join(taf))
-            # pxls = _make_text(draw, taf, text_font, x=100, y=y_text, just=False)
-            y_text += pxls + 35
 
     if with_errors:
-        result = box("okcancel", f"Errores en TAF.", "¿Desea guardar la imagen?")
-        if not result:
-            return "no"
-    return "ok"
-
+        return "no"
+    else:
+        y_text = 420
+        for taf in tafs:
+            taf = TAF(taf)
+            pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
+            y_text += pxls + 35
+        return "ok"
 
 ###########################################################################
 ############################# CREATE WINDS VIEW ###########################

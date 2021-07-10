@@ -7,11 +7,11 @@ from platform import system
 import img2pdf
 from PIL import ImageFont
 
-from .__colors__ import light_blue, white
-from .__version__ import version
-from .frames import Climatology, Ephemeris, Header, SelectUser, box
-from .utils import MONTHS, TODAY, VOLCANOES, date2str, extract
-from .utils.create_view import (
+from app.__colors__ import light_blue, white
+from app.__version__ import version
+from app.frames import Climatology, Ephemeris, Header, SelectUser, box
+from app.utils import MONTHS, TODAY, VOLCANOES, date2str, extract
+from app.utils.create_view import (
     create_clima,
     create_map_img,
     create_taf,
@@ -179,8 +179,6 @@ class App(tk.Tk):
         # create pdf file
         self._create_pdf()
 
-        box("showinfo", f"AeroInformes - {version}", "Informe creado correctamente.")
-
     def _create_pdf(self):
         images = glob.glob("images/output/*")
         user = self.select_user.get_user()
@@ -196,9 +194,17 @@ class App(tk.Tk):
         date = date2str(include_weekday=False)
         report_num = "N1" if TODAY.hour < 10 else "N2"
         file_name = f"{dirname}/Informe Aeronautico {report_num} {date} {user.abbr}.pdf"
+        
+        if os.path.exists(file_name):
+            result = box("okcancel", f"AeroInformes - {version}", f"El {re.sub(r'(.*/)+', '', file_name)} ya existe. ¿Desea sobreescribirlo?")
+            if not result:
+                box("showinfo", f"AeroInformes - {version}", "El informe no ha sido creado.")
+                return
 
         with open(file_name, "wb") as f:
             f.write(img2pdf.convert(sorted(images)))
+            
+        box("showinfo", f"AeroInformes - {version}", "Informe creado correctamente.")
 
     def _set_font_size(self):
         self.big_font = round(self.win_width * 0.035)

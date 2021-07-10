@@ -4,7 +4,7 @@ from tkinter import filedialog as fd
 
 from PIL import Image, ImageTk
 
-from ..__colors__ import light_blue, white
+from app.__colors__ import light_blue, white
 
 
 class Header(Frame):
