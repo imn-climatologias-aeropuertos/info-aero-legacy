@@ -221,22 +221,32 @@ class App(tk.Tk):
         date = date2str(include_weekday=False)
         report_num = "N1" if TODAY.hour < 10 else "N2"
         file_name = f"{dirname}/Informe Aeronautico {report_num} {date} {user.abbr}.pdf"
-        
+
         if os.path.exists(file_name):
-            logger.info(f"Report {file_name} exists, asking to user if want to replace it.")
-            result = box("okcancel", f"AeroInformes - {version}", f"El {re.sub(r'(.*/)+', '', file_name)} ya existe. ¿Desea sobreescribirlo?")
+            logger.info(
+                f"Report {file_name} exists, asking to user if want to replace it."
+            )
+            result = box(
+                "okcancel",
+                f"AeroInformes - {version}",
+                f"El {re.sub(r'(.*/)+', '', file_name)} ya existe. ¿Desea sobreescribirlo?",
+            )
             if not result:
                 logger.info(f"User choose do not replace {file_name}, exiting.")
-                box("showinfo", f"AeroInformes - {version}", "El informe no ha sido creado.")
+                box(
+                    "showinfo",
+                    f"AeroInformes - {version}",
+                    "El informe no ha sido creado.",
+                )
                 return
             logger.info(f"User choose to replace {file_name}.")
 
         logger.info(f"Writing images on {file_name}.")
         with open(file_name, "wb") as f:
             f.write(img2pdf.convert(sorted(images)))
-        
-        logger.info(f"Report created correctly, exiting.")
+
         box("showinfo", f"AeroInformes - {version}", "Informe creado correctamente.")
+        logger.info(f"Report created correctly, exiting.")
 
     def _set_font_size(self):
         logger.info(f"Setting UI font size.")

@@ -10,10 +10,10 @@ from PIL import Image, ImageDraw, ImageFont
 from requests import get
 from requests.exceptions import ConnectionError
 
+from app.__colors__ import blue, grey, light_blue, white
 from app.frames.clima import Station
 from app.frames.messagebox import box
-
-from app.__colors__ import blue, grey, light_blue, white
+from app.utils import logger
 from app.utils.date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
 from app.utils.taf_model import TAF
 from app.utils.winds_model import Wind
@@ -24,14 +24,17 @@ def view_creator(func):
 
     dirname = "images/output"
     if not os.path.exists(dirname):
+        logger.info(f"Path {dirname} doesn't exists. Creating it.")
         os.makedirs(dirname)
 
     def wrapper(*args, **kwargs):
+        logger.info(f"Opening template image to create {args[0]}.")
         img = Image.open(template_path)
         draw = ImageDraw.Draw(img)
         # img, draw = func(img=img, draw=draw, **kwargs)
         result = func(img=img, draw=draw, **kwargs)
         if result == "ok":
+            logger.info(f"Saving {args[0]}.")
             img = img.resize((1200, 900))
             img.save("images/output/" + args[0])
             return False
@@ -45,11 +48,13 @@ def view_creator(func):
 def _make_title(
     draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90, color=light_blue
 ):
+    logger.info(f"Making image title {text[:10]}...")
     text = text.center(46, " ")
     draw.text((x, y), text, font=font, fill=color)
 
 
 def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=210):
+    logger.info(f"Making image subtitle {text[:10]}...")
     text = text.center(40, " ")
     draw.text((x, y), text, font=font, fill=light_blue)
 
@@ -63,6 +68,7 @@ def _make_text(
     color=blue,
     just=True,
 ):
+    logger.info(f"Making image text {text[:10]}...")
     if just is True:
         ltext = justify(text, 70)
         draw.text((x, y), "\n".join(ltext), font=font, fill=color)
@@ -90,8 +96,10 @@ def create_map_img(*args, **kwargs):
     _make_title(draw, "Meteorología Aeronáutica", title_font)
     _make_subtitle(draw, date2str().capitalize(), subtitle_font)
     if TODAY.hour >= 11:
+        logger.info(f"Adding 'ACTUALIZADO' label to report.")
         _make_text(draw, "ACTUALIZADO", text_font, x=210, y=270, color=blue)
 
+    logger.info(f"Adding SIGWX Map to image.")
     map_img = Image.open(map_img_path)
     map_img = map_img.resize((2000, 1294))
     img.paste(map_img, (200, 335))
@@ -129,7 +137,9 @@ def create_trend01(*args, **kwargs):
     docx = kwargs.get("docx")
 
     if docx is None:
+        logger.info(f"create_trend01(): docx file is NONE, returning.")
         return
+    logger.info(f"create_trend01(): Obtaining text from docx file.")
     text = TrendText(docx)
     _make_title(draw, text.title, title_font)
     _make_subtitle(draw, text.subtitle, subtitle_font)
@@ -156,7 +166,9 @@ def create_trend02(*args, **kwargs):
     docx = kwargs.get("docx")
 
     if docx is None:
+        logger.info(f"create_trend02(): docx file is NONE, returning.")
         return
+    logger.info(f"create_trend02(): Obtaining text from docx file.")
     text = TrendText(kwargs.get("docx"))
     _make_title(draw, text.title, title_font)
     _make_subtitle(draw, text.subtitle, subtitle_font)
@@ -196,19 +208,23 @@ def _paste_vash_img(
     found = False
     for fmt in [".png", ".jpg", ".gif", ".jpeg", ".bmp"]:
         try:
-            ash_img = Image.open(f"images/volcanoes/{dirname}/image{img_num}{fmt}")
-        except FileNotFoundError:
+            img_path = f"images/volcanoes/{dirname}/image{img_num}{fmt}"
+            logger.info(f"Try to open volcanic ash image: {img_path}")
+            ash_img = Image.open(img_path)
+        except FileNotFoundError as e:
+            logger.error(f"{e}")
             continue
         else:
+            logger.info(f"Volcanic ash image found: {img_path}")
             ash_img = ash_img.resize(img_size)
             img.paste(ash_img, paste_pos)
             found = True
             break
 
     if not found:
-        raise FileNotFoundError(
-            f"No se encuentra la imagen {img_num} del Volcán {name.title()}."
-        )
+        msg = f"No se encuentra la imagen {img_num} del Volcán {name.title()}."
+        logger.error(f"Raising FileNotFoundError: {msg}")
+        raise FileNotFoundError(msg)
 
 
 @view_creator
@@ -232,8 +248,10 @@ def create_volcanic_ash(*args, **kwargs):
     except FileNotFoundError as e:
         result = box(*box_params, e)
         if result:
+            logger.info("User choose to continue creating view with errors.")
             with_errors = True
         else:
+            logger.info("User choose to stop creating report.")
             return
 
     try:
@@ -243,8 +261,10 @@ def create_volcanic_ash(*args, **kwargs):
     except FileNotFoundError as e:
         result = box(*box_params, e)
         if result:
+            logger.info("User choose to continue creating view with errors.")
             with_errors = True
         else:
+            logger.info("User choose to stop creating report.")
             return
 
     if with_errors:
@@ -253,9 +273,10 @@ def create_volcanic_ash(*args, **kwargs):
             "Imagen con errores.",
             "¿Desea guardar la imagen para este volcán?",
         )
-        if result:
-            return "ok"
-        return "no"
+        if not result:
+            logger.info("User choose do not save volcanic ash view.")
+            return "no"
+    logger.info("User choose save volcanic ash view.")
     return "ok"
 
 
@@ -263,23 +284,34 @@ def create_volcanic_ash(*args, **kwargs):
 ############################## CREATE TAF VIEW ############################
 ###########################################################################
 
-#BASE_URL_ADDS = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=0"
+# BASE_URL_ADDS = "http://www.aviationweather.gov/adds/dataserver_current/httpparam?dataSource=tafs&requestType=retrieve&format=csv&stationString={}&hoursBeforeNow=0"
 # BASE_URL_NOAA = "https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{}.TXT"
 
 BASE_URL_OGIMET = "http://ogimet.com/display_metars2.php?lugar=MROC+MRLB+MRLM+MRPV&tipo=FT&ord=REV&nil=NO&fmt=txt&ano={}&mes={:02d}&day={:02d}&hora={:02d}&anof={}&mesf={:02d}&dayf={:02d}&horaf={:02d}&minf=59&enviar=Ver"
 
+
 def _process_ogimet_taf(taf: List[str]):
     first_line = taf[0] + " " + taf[1]
-    
+
     return " ".join([first_line] + taf[2:] if len(taf) > 2 else [first_line])
+
 
 def _taf_from_ogimet():
     UTC = pytz.utc
     tafs = []
     yestarday = YESTERDAY.astimezone(tz=UTC)
     today = TODAY.astimezone(tz=UTC)
-    url = BASE_URL_OGIMET.format(yestarday.year, yestarday.month, yestarday.day, yestarday.hour, today.year, today.month, today.day, today.hour)
-    
+    url = BASE_URL_OGIMET.format(
+        yestarday.year,
+        yestarday.month,
+        yestarday.day,
+        yestarday.hour,
+        today.year,
+        today.month,
+        today.day,
+        today.hour,
+    )
+
     res = get(url)
     taf_found = False
     taf = []
@@ -292,20 +324,23 @@ def _taf_from_ogimet():
                 taf = []
         if re.match(r"#\s+TAF\s+LARGOS", line):
             taf_found = True
-    
+
     return tafs
 
+
 BASE_URL_ADDS = "https://www.aviationweather.gov/taf/data?ids=MROC+MRLB+MRLM+MRPV&format=raw&date=&submit=Get+TAF+data"
+
 
 def _taf_from_adds():
     tafs = []
     res = get(BASE_URL_ADDS)
     soup = BeautifulSoup(res.text, "html.parser")
-    
+
     for taf in soup.find_all("code"):
         tafs.append(taf.getText())
-    
+
     return tafs
+
 
 @view_creator
 def create_taf(*args, **kwargs):
@@ -325,29 +360,42 @@ def create_taf(*args, **kwargs):
     else:
         subtitle = subtitle.format("06", tomorrow2str())
     _make_subtitle(draw, subtitle, text_font, x=330, y=280)
-    
+
     with_errors = False
     try:
+        logger.info("Try get TAF from ADDS.")
         tafs = _taf_from_adds()
-    except ConnectionError:
+    except ConnectionError as e:
+        logger.error("ConnectionError: {e}.")
         try:
+            logger.info("Try get TAF from Ogimet.")
             tafs = _taf_from_ogimet()
-        except ConnectionError:
-            result = box("okcancel", "Error de conexión.", "No se puede acceder a los TAF. ¿Desea continuar? Se omitirá esta imagen.")
+        except ConnectionError as e:
+            logger.error("ConnectionError: {e}.")
+            result = box(
+                "okcancel",
+                "Error de conexión.",
+                "No se puede acceder a los TAF. ¿Desea continuar? Se omitirá esta imagen.",
+            )
             if result:
                 with_errors = True
             else:
                 return
 
     if with_errors:
+        logger.info("User choose do not save TAF view.")
         return "no"
     else:
+        logger.info("User choose save TAF view.")
         y_text = 420
         for taf in tafs:
             taf = TAF(taf)
-            pxls = _make_text(draw, taf.formated, text_font, x=100, y=y_text, just=False)
+            pxls = _make_text(
+                draw, taf.formated, text_font, x=100, y=y_text, just=False
+            )
             y_text += pxls + 35
         return "ok"
+
 
 ###########################################################################
 ############################# CREATE WINDS VIEW ###########################
@@ -462,9 +510,11 @@ def _get_winds_data():
         u_url = BASE_WINDS_U_URL.format(stn)
         v_url = BASE_WINDS_V_URL.format(stn)
         try:
+            logger.info(f"Try get winds data for station {stn}.")
             u_res = get(u_url)
             v_res = get(v_url)
         except ConnectionError as e:
+            logger.error(f"ConnectionError with winds source for {stn}: {e}.")
             result = box(
                 "okcancel",
                 f"Error de conexión.",
@@ -477,6 +527,7 @@ def _get_winds_data():
             u, v = _process_response(u_res, v_res)
             winds[stn] = Wind(u, v)
 
+    logger.info("All winds obtained succesfully.")
     return winds
 
 
@@ -541,6 +592,7 @@ def create_winds(*args, **kwargs):
     _write_winds_table_text(draw, table_font)
     _write_winds_on_table(draw, winds, title_font, table_font)
 
+    logger.info("Saving winds table view.")
     return "ok"
 
 
@@ -705,4 +757,5 @@ def create_clima(*args, **kwargs):
     _write_ephemeris(img, draw, subtitle_font, text_font, data=ephemeris)
     _write_user_data(draw, text_font, data=user)
 
+    logger.info("Saving climatology view.")
     return "ok"

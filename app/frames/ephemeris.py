@@ -4,8 +4,7 @@ from dateutil import tz
 from suntime import Sun
 
 from app.__colors__ import blue, light_blue, white
-from app.utils import TODAY, TOMORROW
-from app.utils import logger
+from app.utils import TODAY, TOMORROW, logger
 
 
 class Hour(Frame):
@@ -120,4 +119,5 @@ class Ephemeris(Frame):
         self.data.pack()
 
     def get_ephemeris_time(self):
+        logger.info(f"Getting ephemeris times.")
         return self.sunrise.entry.get(), self.sunset.entry.get()
