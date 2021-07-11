@@ -3,12 +3,15 @@ import logging
 logger = logging
 loggin_level = logging.DEBUG
 
+with open("./logging.log", "w") as f:
+    pass
+
 logger.basicConfig(
     level=loggin_level,
     format="%(asctime)s: %(levelname)s [%(filename)s:%(lineno)s] %(message)s",
     datefmt="%Y/%m/%d %I:%M:%S %p",
     handlers=[
-        logging.FileHandler("../logging.log"),
+        logging.FileHandler("./logging.log"),
         logging.StreamHandler(),
     ],
 )
