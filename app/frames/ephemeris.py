@@ -5,6 +5,7 @@ from suntime import Sun
 
 from app.__colors__ import blue, light_blue, white
 from app.utils import TODAY, TOMORROW
+from app.utils import logger
 
 
 class Hour(Frame):
@@ -35,6 +36,7 @@ class Hour(Frame):
         self.config(bg=white, width=self.width, height=self.height)
         self.grid(row=self.row, column=self.column)
 
+        logger.info("Creating ephemeris entries.")
         # set time of ephemeris
         self._set_ephemeris()
 
@@ -62,6 +64,7 @@ class Hour(Frame):
         self.entry.insert(0, self.date.strftime("%I:%M %p"))
 
     def _set_ephemeris(self):
+        logger.info(f"Setting ephemeris time: {self.ephem}.")
         sun = Sun(9.928069, -84.090725)
         tzone = tz.gettz("America/Costa_Rica")
 
