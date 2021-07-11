@@ -5,6 +5,7 @@ from tkinter import filedialog as fd
 from PIL import Image, ImageTk
 
 from app.__colors__ import light_blue, white
+from app.utils import logger
 
 
 class Header(Frame):
@@ -18,6 +19,7 @@ class Header(Frame):
         self.create_widgets()
 
     def create_widgets(self):
+        logger.info(f"Creating header widgets.")
         # set the imn logo
         self.imn = ImageTk.PhotoImage(
             Image.open("assets/img/logo_imn.png").resize(
@@ -57,6 +59,7 @@ class Header(Frame):
                 if result:
                     return l[i]
 
+            logger.error("Trend file not found, raising AttributeError.")
             raise AttributeError("trend file not found.")
         return l[:3]
 
@@ -69,6 +72,7 @@ class Header(Frame):
             ("All files", "."),
         )
 
+        logger.info("Open file dialog for asking SIGWX map path.")
         self.sigwx_map = fd.askopenfile(
             initialdir="/Images",
             title="Seleccione el Mapa SIGWX",
@@ -83,6 +87,7 @@ class Header(Frame):
             ("All files", "."),
         )
 
+        logger.info("Open file dialog for asking .docx files path.")
         self.docx_files = fd.askopenfilenames(
             initialdir="/Documents",
             title="Seleccione los Avisos de Ceniza Volcánica",
@@ -90,6 +95,7 @@ class Header(Frame):
         )
 
     def _create_buttons(self):
+        logger.info("Creating header buttons.")
         __frame = Frame(self, bg=white)
 
         # set button: add map
