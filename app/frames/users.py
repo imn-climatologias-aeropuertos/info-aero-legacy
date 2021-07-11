@@ -3,6 +3,7 @@ from collections import namedtuple
 from tkinter import Entry, Frame, Label, Radiobutton, StringVar
 
 from app.__colors__ import blue, light_blue, white
+from app.utils import logger
 
 User = namedtuple("User", "name email abbr value")
 
@@ -36,6 +37,7 @@ class OtherUser(Frame):
         self._create()
 
     def _create(self):
+        logger.info("Creating OtherUser widgets.")
         self.name_label = Label(
             self,
             text="Nombre",
@@ -64,6 +66,7 @@ class OtherUser(Frame):
         self.email_entry.grid(row=1, column=1)
 
     def get_values(self):
+        logger.info("Getting OtherUser values, name and email.")
         return self.name_entry.get(), self.email_entry.get()
 
 
@@ -88,6 +91,7 @@ class SelectUser(Frame):
         self.config(bg=white, width=self.width, height=self.height)
         self.pack()
 
+        logger.info("Creating select user widgets.")
         # Radio buttons sentinel variable
         self.rbtn_value = StringVar(self, "4")
 
@@ -137,6 +141,7 @@ class SelectUser(Frame):
             column += 1
 
     def get_user(self):
+        logger.info("Getting user data.")
         user_index = int(self.rbtn_value.get())
         if self.rbtn_value.get() in "0123":
             return USERS[user_index]
