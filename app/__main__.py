@@ -9,7 +9,7 @@ from PIL import ImageFont
 
 from app.__colors__ import light_blue, white
 from app.__version__ import version
-from app.frames import Climatology, Ephemeris, Header, SelectUser, box
+from app.frames import Climatology, Ephemeris, Header, SelectUser, box, Footer
 from app.utils import MONTHS, TODAY, VOLCANOES, date2str, extract, logger
 from app.utils.create_view import (
     create_clima,
@@ -73,26 +73,7 @@ class App(tk.Tk):
 
         # Footer buttons
         logger.info("Creating the bottom buttons.")
-        tk.Label(self, width=self.win_width, height=0 - 5, bg=white).pack()
-        tk.Button(
-            self,
-            text="Crear Informe",
-            pady=10,
-            padx=20,
-            relief="flat",
-            fg=white,
-            bg=light_blue,
-            command=self._create_report,
-        ).pack()
-        tk.Label(self, width=self.win_width, height=0 - 5, bg=white).pack()
-        tk.Button(
-            self,
-            text="Salir",
-            relief="flat",
-            fg=white,
-            bg=light_blue,
-            command=self.destroy,
-        ).pack()
+        Footer(master=self, create_command=self._create_report, exit_command=self.destroy)
 
         self._delete_images()
 
@@ -259,7 +240,7 @@ class App(tk.Tk):
         screen_height = self.winfo_screenheight()
 
         self.win_width = round(screen_width * 0.40)
-        self.win_height = round(screen_height * 0.84)
+        self.win_height = round(screen_height * 0.70)
         self.x_position = screen_width // 2 - self.win_width // 2
         self.y_position = (
             screen_height // 2 - self.win_height // 2 - round(screen_height * 0.03)
