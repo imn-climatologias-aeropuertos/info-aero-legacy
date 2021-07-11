@@ -1,6 +1,7 @@
 from tkinter import Entry, Frame, Label
 
 from app.__colors__ import blue, light_blue, white
+from app.utils import logger
 
 
 class Station(Frame):
@@ -30,6 +31,7 @@ class Station(Frame):
         self._create_entries()
 
     def _create_entries(self):
+        logger.info("Creating climatology entries.")
         # labels and entries
         Label(
             self.master,
@@ -58,6 +60,7 @@ class Station(Frame):
         return entry
 
     def get_values(self):
+        logger.info(f"Getting climatology values for {self.name}.")
         return self.tmax.get(), self.tmin.get(), self.prec.get()
 
 
@@ -83,6 +86,7 @@ class Climatology(Frame):
         self.config(bg=white, width=self.width, height=self.height)
         self.pack()
 
+        logger.info("Creating climatology widgets.")
         # Section title
         self.title = Label(
             self,
