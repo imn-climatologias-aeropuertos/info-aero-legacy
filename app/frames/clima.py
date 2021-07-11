@@ -60,7 +60,7 @@ class Station(Frame):
         return entry
 
     def get_values(self):
-        logger.info(f"Getting climatology values for {self.name}.")
+        logger.info(f"Getting climatology values for {self.name.upper()}.")
         return self.tmax.get(), self.tmin.get(), self.prec.get()
 
 
