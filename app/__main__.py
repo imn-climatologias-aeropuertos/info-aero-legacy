@@ -240,7 +240,7 @@ class App(tk.Tk):
         screen_height = self.winfo_screenheight()
 
         self.win_width = round(screen_width * 0.40)
-        self.win_height = round(screen_height * 0.70)
+        self.win_height = round(self.win_width * 0.9844)
         self.x_position = screen_width // 2 - self.win_width // 2
         self.y_position = (
             screen_height // 2 - self.win_height // 2 - round(screen_height * 0.03)
