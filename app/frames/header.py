@@ -75,7 +75,7 @@ class Header(Frame):
         logger.info("Open file dialog for asking SIGWX map path.")
         self.sigwx_map = fd.askopenfile(
             initialdir="/Images",
-            title="Seleccione el Mapa SIGWX",
+            title="Seleccione el Mapa SIGWX.",
             filetypes=filetypes,
         )
         # print(self.sigwx_map)
@@ -90,7 +90,7 @@ class Header(Frame):
         logger.info("Open file dialog for asking .docx files path.")
         self.docx_files = fd.askopenfilenames(
             initialdir="/Documents",
-            title="Seleccione los Avisos de Ceniza Volcánica",
+            title="Seleccione los archivos de MS Word.",
             filetypes=filetypes,
         )
 
