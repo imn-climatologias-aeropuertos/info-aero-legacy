@@ -1,5 +1,6 @@
 import os
 import re
+from tkinter import font
 from typing import List
 
 import pytz
@@ -9,6 +10,7 @@ from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
 from requests import get
 from requests.exceptions import ConnectionError
+from abc import ABC, abstractmethod
 
 from app.__colors__ import blue, grey, light_blue, white
 from app.frames.clima import Station
@@ -17,7 +19,9 @@ from app.utils import logger
 from app.utils.date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
 from app.utils.taf_model import TAF
 from app.utils.winds_model import Wind
+from app.utils import Fonts
 
+fonts = Fonts()
 
 def view_creator(func):
     template_path = "assets/img/template.png"
@@ -46,26 +50,26 @@ def view_creator(func):
 
 
 def _make_title(
-    draw: ImageDraw.Draw, text: str, font: ImageFont, x=0, y=90, color=light_blue
+    draw: ImageDraw.Draw, text: str, x=0, y=90, color=light_blue
 ):
     logger.info(f"Making image title {text[:10]}...")
     text = text.center(46, " ")
-    draw.text((x, y), text, font=font, fill=color)
+    draw.text((x, y), text, font=fonts.title, fill=color)
 
 
-def _make_subtitle(draw: ImageDraw.Draw, text: str, font: ImageFont, x=400, y=210):
+def _make_subtitle(draw: ImageDraw.Draw, text: str, x=400, y=210):
     logger.info(f"Making image subtitle {text[:10]}...")
     text = text.center(40, " ")
-    draw.text((x, y), text, font=font, fill=light_blue)
+    draw.text((x, y), text, font=fonts.subtitle, fill=light_blue)
 
 
 def _make_text(
     draw: ImageDraw.Draw,
     text: str,
-    font: ImageFont,
     x=200,
     y=325,
     color=blue,
+    font=fonts.text,
     just=True,
 ):
     logger.info(f"Making image text {text[:10]}...")
@@ -89,15 +93,12 @@ def create_map_img(*args, **kwargs):
     img = kwargs.get("img")
     map_img_path = kwargs.get("map").name
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    subtitle_font = kwargs.get("subtitle_font")
-    text_font = kwargs.get("text_font")
 
-    _make_title(draw, "Meteorología Aeronáutica", title_font)
-    _make_subtitle(draw, date2str().capitalize(), subtitle_font)
+    _make_title(draw, "Meteorología Aeronáutica")
+    _make_subtitle(draw, date2str().capitalize())
     if TODAY.hour >= 11:
         logger.info(f"Adding 'ACTUALIZADO' label to report.")
-        _make_text(draw, "ACTUALIZADO", text_font, x=210, y=270, color=blue)
+        _make_text(draw, "ACTUALIZADO", x=210, y=270, color=blue)
 
     logger.info(f"Adding SIGWX Map to image.")
     map_img = Image.open(map_img_path)
@@ -131,9 +132,6 @@ class TrendText:
 @view_creator
 def create_trend01(*args, **kwargs):
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    subtitle_font = kwargs.get("subtitle_font")
-    text_font = kwargs.get("text_font")
     docx = kwargs.get("docx")
 
     if docx is None:
@@ -141,18 +139,18 @@ def create_trend01(*args, **kwargs):
         return
     logger.info(f"create_trend01(): Obtaining text from docx file.")
     text = TrendText(docx)
-    _make_title(draw, text.title, title_font)
-    _make_subtitle(draw, text.subtitle, subtitle_font)
-    _ = _make_text(draw, text.valid, text_font, x=700)
+    _make_title(draw, text.title)
+    _make_subtitle(draw, text.subtitle)
+    _ = _make_text(draw, text.valid, x=700)
 
     y_text = 500
-    _ = _make_text(draw, text.general[0], text_font, y=y_text, color=light_blue)
+    _ = _make_text(draw, text.general[0], y=y_text, color=light_blue)
     y_text += 75
-    pxls = _make_text(draw, text.general[1], text_font, y=y_text)
+    pxls = _make_text(draw, text.general[1], y=y_text)
     y_text += pxls + 75
-    _ = _make_text(draw, text.aerodromes[0], text_font, y=y_text, color=light_blue)
+    _ = _make_text(draw, text.aerodromes[0], y=y_text, color=light_blue)
     y_text += 75
-    _ = _make_text(draw, text.aerodromes[1], text_font, y=y_text)
+    _ = _make_text(draw, text.aerodromes[1], y=y_text)
 
     return "ok"
 
@@ -160,9 +158,6 @@ def create_trend01(*args, **kwargs):
 @view_creator
 def create_trend02(*args, **kwargs):
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    subtitle_font = kwargs.get("subtitle_font")
-    text_font = kwargs.get("text_font")
     docx = kwargs.get("docx")
 
     if docx is None:
@@ -170,22 +165,22 @@ def create_trend02(*args, **kwargs):
         return
     logger.info(f"create_trend02(): Obtaining text from docx file.")
     text = TrendText(kwargs.get("docx"))
-    _make_title(draw, text.title, title_font)
-    _make_subtitle(draw, text.subtitle, subtitle_font)
-    _ = _make_text(draw, text.valid, text_font, x=700)
+    _make_title(draw, text.title)
+    _make_subtitle(draw, text.subtitle)
+    _ = _make_text(draw, text.valid, x=700)
 
     y_text = 450
-    _ = _make_text(draw, text.aerodromes[2], text_font, y=y_text, color=light_blue)
+    _ = _make_text(draw, text.aerodromes[2], y=y_text, color=light_blue)
     y_text += 75
-    pxls = _make_text(draw, text.aerodromes[3], text_font, y=y_text)
+    pxls = _make_text(draw, text.aerodromes[3], y=y_text)
     y_text += pxls + 65
-    _ = _make_text(draw, text.aerodromes[4], text_font, y=y_text, color=light_blue)
+    _ = _make_text(draw, text.aerodromes[4], y=y_text, color=light_blue)
     y_text += 75
-    pxls = _make_text(draw, text.aerodromes[5], text_font, y=y_text)
+    pxls = _make_text(draw, text.aerodromes[5], y=y_text)
     y_text += pxls + 65
-    _make_text(draw, text.aerodromes[6], text_font, y=y_text, color=light_blue)
+    _make_text(draw, text.aerodromes[6], y=y_text, color=light_blue)
     y_text += 75
-    _make_text(draw, text.aerodromes[7], text_font, y=y_text)
+    _make_text(draw, text.aerodromes[7], y=y_text)
 
     return "ok"
 
@@ -231,15 +226,12 @@ def _paste_vash_img(
 def create_volcanic_ash(*args, **kwargs):
     img = kwargs.get("img")
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    subtitle_font = kwargs.get("subtitle_font")
-    text_font = kwargs.get("text_font")
     name = kwargs.get("name")
     dirname = kwargs.get("dir")
 
-    _make_title(draw, "Dispersión de Ceniza", title_font)
-    _make_subtitle(draw, f"Volcán {name}", subtitle_font)
-    _make_text(draw, vash_text.format(tomorrow2str()), text_font)
+    _make_title(draw, "Dispersión de Ceniza")
+    _make_subtitle(draw, f"Volcán {name}")
+    _make_text(draw, vash_text.format(tomorrow2str()))
 
     box_params = ["okcancel", "Faltan imágenes."]
     with_errors = False
@@ -345,10 +337,8 @@ def _taf_from_adds():
 @view_creator
 def create_taf(*args, **kwargs):
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    text_font = kwargs.get("text_font")
 
-    _make_title(draw, "Terminal Aerodrome Forecast (TAF)", title_font)
+    _make_title(draw, "Terminal Aerodrome Forecast (TAF)")
 
     subtitle = "TAF válidos hasta las {}:00Z del {}"
     if TODAY.hour >= 17:
@@ -359,7 +349,7 @@ def create_taf(*args, **kwargs):
         subtitle = subtitle.format("12", tomorrow2str())
     else:
         subtitle = subtitle.format("06", tomorrow2str())
-    _make_subtitle(draw, subtitle, text_font, x=330, y=280)
+    _make_text(draw, subtitle, x=330, y=280, color=light_blue, just=False)
 
     with_errors = False
     try:
@@ -391,7 +381,7 @@ def create_taf(*args, **kwargs):
         for taf in tafs:
             taf = TAF(taf)
             pxls = _make_text(
-                draw, taf.formated, text_font, x=100, y=y_text, just=False
+                draw, taf.formated, x=100, y=y_text, just=False
             )
             y_text += pxls + 35
         return "ok"
@@ -443,17 +433,17 @@ def _draw_winds_table(draw: ImageDraw.Draw):
     draw.line((150, 700, 150, 1606), fill=blue, width=5)
 
 
-def _write_winds_table_text(draw: ImageDraw.Draw, font: ImageFont):
-    draw.text((210, 570), "Fecha", font=font, fill=blue)
-    draw.text((180, 640), "Hora UTC", font=font, fill=blue)
-    draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=font, fill=blue)
+def _write_winds_table_text(draw: ImageDraw.Draw):
+    draw.text((210, 570), "Fecha", font=fonts.table, fill=blue)
+    draw.text((180, 640), "Hora UTC", font=fonts.table, fill=blue)
+    draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=fonts.table, fill=blue)
 
     note = "Nota: los datos aquí presentados corresponden al promedio de las 6 horas anteriores. La dirección corresponde a la procedencia del viento."
     note = justify(note, 75, justify_last_line=True)
     draw.text(
         (150, 1720),
         "\n".join(note),
-        font=ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 32),
+        font=fonts.note,
         fill=white,
     )
 
@@ -467,7 +457,7 @@ def _write_winds_table_text(draw: ImageDraw.Draw, font: ImageFont):
     ]
     y_top = 730
     for level in levels:
-        draw.text((170, y_top), level, font=font, fill=blue)
+        draw.text((170, y_top), level, font=fonts.table, fill=blue)
         y_top += 151
 
 
@@ -532,31 +522,31 @@ def _get_winds_data():
 
 
 def _write_winds_on_table(
-    draw: ImageDraw.Draw, winds: dict, title_font: ImageFont, text_font: ImageFont
+    draw: ImageDraw.Draw, winds: dict
 ):
     x = 400
     y = 450
     for stn, wind in winds.items():
         date = TODAY
-        _make_text(draw, stn, title_font, x=x + 130, y=y, color=white)
+        _make_text(draw, stn, x=x + 130, y=y, color=white, font=fonts.title)
         _x = 25
         for time in wind.hours:
             _y = 120
             _make_text(
                 draw,
                 "{:02d}".format(date.day),
-                text_font,
                 x=x + _x + 10,
                 y=y + _y,
                 color=white,
+                font=fonts.table
             )
             _y += 75
-            _make_text(draw, time, text_font, x=x + _x, y=y + _y, color=white)
+            _make_text(draw, time, x=x + _x, y=y + _y, color=white, font=fonts.table)
             _y += 85
             for level in [300, 400, 500, 700, 850, 925]:
                 text = wind.values(time, level)
                 _make_text(
-                    draw, text, text_font, x=x + _x, y=y + _y, color=blue, just=False
+                    draw, text, x=x + _x, y=y + _y, color=blue, just=False, font=fonts.table
                 )
                 _y += 151
             _x += 113
@@ -567,10 +557,6 @@ def _write_winds_on_table(
 @view_creator
 def create_winds(*args, **kwargs):
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    subtitle_font = kwargs.get("subtitle_font")
-    text_font = kwargs.get("text_font")
-    table_font = kwargs.get("table_font")
 
     # get the winds from internet
     try:
@@ -578,19 +564,18 @@ def create_winds(*args, **kwargs):
     except ConnectionError:
         return
 
-    _make_title(draw, "Vientos en Altura", title_font)
-    _make_subtitle(draw, "Dirección y Velocidad (kt)", subtitle_font)
+    _make_title(draw, "Vientos en Altura")
+    _make_subtitle(draw, "Dirección y Velocidad (kt)")
     _make_text(
         draw,
         f"Válido hasta las {'12'}:00Z del {tomorrow2str()}",
-        text_font,
         x=400,
         y=345,
     )
 
     _draw_winds_table(draw)
-    _write_winds_table_text(draw, table_font)
-    _write_winds_on_table(draw, winds, title_font, table_font)
+    _write_winds_table_text(draw)
+    _write_winds_on_table(draw, winds)
 
     logger.info("Saving winds table view.")
     return "ok"
@@ -624,8 +609,6 @@ def _draw_clima_table(draw: ImageDraw.Draw):
 
 def _write_clima_table_text(
     draw: ImageDraw.Draw,
-    title_font: ImageFont,
-    text_font: ImageFont,
     clima: List[Station],
 ):
     titles = [
@@ -641,7 +624,7 @@ def _write_clima_table_text(
             x_left += 90
         if titles.index(title) == 3:
             x_left += 10
-        _make_text(draw, title, title_font, color=white, x=x_left, y=390, just=False)
+        _make_text(draw, title, color=white, x=x_left, y=390, just=False)
         x_left += 450
 
     y_top = 575
@@ -653,7 +636,7 @@ def _write_clima_table_text(
     ]
     for stn in stations:
         stn = stn.center(25, " ")
-        _make_text(draw, stn, text_font, color=blue, x=220, y=y_top, just=False)
+        _make_text(draw, stn, color=blue, x=220, y=y_top, just=False, font=fonts.table)
         y_top += 100
 
     x_left = 1010
@@ -663,29 +646,29 @@ def _write_clima_table_text(
         _make_text(
             draw,
             tmax.center(5, " "),
-            text_font,
             x=x_left,
             y=y_top,
             just=False,
             color=blue,
+            font=fonts.table
         )
         _make_text(
             draw,
             tmin.center(5, " "),
-            text_font,
             x=x_left + 450,
             y=y_top,
             just=False,
             color=blue,
+            font=fonts.table
         )
         _make_text(
             draw,
             prec.center(5, " "),
-            text_font,
             x=x_left + 900,
             y=y_top,
             just=False,
             color=blue,
+            font=fonts.table
         )
         y_top += 100
 
@@ -693,23 +676,21 @@ def _write_clima_table_text(
 def _write_ephemeris(
     img: Image,
     draw: ImageDraw.Draw,
-    title_font: ImageFont,
-    text_font: ImageFont,
     data=("00:00 AM", "00:00 AM"),
 ):
     _make_text(
         draw,
         "Salida y Puesta del Sol",
-        title_font,
         color=blue,
         just=False,
         x=250,
         y=1000,
+        font=fonts.subtitle,
     )
     _make_text(
-        draw, "Salida de mañana", text_font, color=blue, just=False, x=250, y=1100
+        draw, "Salida de mañana", color=blue, just=False, x=250, y=1100
     )
-    _make_text(draw, "Puesta de hoy", text_font, color=blue, just=False, x=775, y=1100)
+    _make_text(draw, "Puesta de hoy", color=blue, just=False, x=775, y=1100)
 
     sunrise = Image.open("assets/img/sunrise.png")
     sunset = Image.open("assets/img/sunset.png")
@@ -719,11 +700,11 @@ def _write_ephemeris(
     draw.rectangle((250, 1500, 1200, 1600), fill=light_blue)
     x_left = 370
     for d in data:
-        _make_text(draw, d, text_font, color=white, x=x_left, y=1525)
+        _make_text(draw, d, color=white, x=x_left, y=1525)
         x_left += 500
 
 
-def _write_user_data(draw: ImageDraw.Draw, font, data=("Name", "email@email.com")):
+def _write_user_data(draw: ImageDraw.Draw, data=("Name", "email@email.com")):
     text = "{}\n{}\n{}\n{}@imn.ac.cr\n{}".format(
         data[0],
         "Meteorología Aeronáutica (IMN)",
@@ -732,30 +713,26 @@ def _write_user_data(draw: ImageDraw.Draw, font, data=("Name", "email@email.com"
         "Telefax: (+506) 2232-2071\nWeb (IMN): www.imn.ac.cr",
     )
 
-    _make_text(draw, text.strip(), font, color=blue, x=1280, y=1200, just=False)
+    _make_text(draw, text.strip(), color=blue, x=1280, y=1200, just=False)
 
 
 @view_creator
 def create_clima(*args, **kwargs):
     img = kwargs.get("img")
     draw = kwargs.get("draw")
-    title_font = kwargs.get("title_font")
-    subtitle_font = kwargs.get("subtitle_font")
-    text_font = kwargs.get("text_font")
-    table_font = kwargs.get("table_font")
     clima = kwargs.get("clima")
     ephemeris = kwargs.get("ephemeris")
     user = kwargs.get("user")
 
     yesterday = date2str(date=YESTERDAY)
 
-    _make_title(draw, "Datos Climatológicos", title_font)
-    _make_subtitle(draw, yesterday.capitalize(), subtitle_font)
+    _make_title(draw, "Datos Climatológicos")
+    _make_subtitle(draw, yesterday.capitalize())
 
     _draw_clima_table(draw)
-    _write_clima_table_text(draw, text_font, table_font, clima)
-    _write_ephemeris(img, draw, subtitle_font, text_font, data=ephemeris)
-    _write_user_data(draw, text_font, data=user)
+    _write_clima_table_text(draw, clima)
+    _write_ephemeris(img, draw, data=ephemeris)
+    _write_user_data(draw, data=user)
 
     logger.info("Saving climatology view.")
     return "ok"

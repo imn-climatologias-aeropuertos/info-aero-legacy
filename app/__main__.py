@@ -133,10 +133,6 @@ class App(tk.Tk):
             docx = None
 
         data = {
-            "title_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 86),
-            "subtitle_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 68),
-            "text_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 48),
-            "table_font": ImageFont.truetype("assets/fonts/DejaVuSansMono.ttf", 40),
             "map": map,
             "docx": docx,
             "clima": self.clima.stations,

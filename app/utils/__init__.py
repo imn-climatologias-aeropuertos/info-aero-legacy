@@ -8,3 +8,4 @@ from app.utils.date_utils import (
 )
 from app.utils.docx2img import VOLCANOES, extract
 from app.utils.logger_model import logger
+from app.utils.font_model import Fonts
