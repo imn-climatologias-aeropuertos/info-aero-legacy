@@ -51,9 +51,9 @@ class Wind:
         self._v = WindComponent(v_data)
         self.hours = self._u.time[1:]
 
-    def _direction(self, u, v):
-        if u == 0.0 and v == 0.0:
-            return "Calmo"
+    def _direction(self, u, v, mag):
+        if mag == "0":
+            return "CLM"
 
         _dir = atan2(u, v) * 180 / pi + 180
 
@@ -68,16 +68,18 @@ class Wind:
                 return key
 
         return None
+    
+    def _magnitude(self, u, v):
+        return sqrt(u ** 2 + v ** 2)
 
     def values(self, time: str, level: int):
         u = self._u.component(time, level)
         v = self._v.component(time, level)
 
-        direction = self._direction(u, v)
+        speed = "{:.0f}".format(self._magnitude(u, v))
+        
+        direction = self._direction(u, v, speed)
         direction = direction.center(3, " ")
-
-        speed = sqrt(u ** 2 + v ** 2)
-        speed = "{:.0f}".format(speed)
         speed = speed.center(3, " ")
 
         return "{}\n{}".format(direction, speed)

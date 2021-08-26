@@ -460,8 +460,12 @@ def _write_winds_table_text(draw: ImageDraw.Draw):
     draw.text((180, 640), "Hora UTC", font=fonts.table, fill=blue)
     draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=fonts.table, fill=blue)
 
-    note = "Nota: los datos aquí presentados corresponden al promedio de las 6 horas anteriores. La dirección corresponde a la procedencia del viento."
-    note = justify(note, 75, justify_last_line=True)
+    note = (
+        "Nota: los datos aquí presentados corresponden al promedio de las 6 horas anteriores."
+        " La dirección corresponde a la procedencia del viento."
+        " CLM indica viento calmo."
+    )
+    note = justify(note, 84)
     draw.text(
         (150, 1720),
         "\n".join(note),
