@@ -1,5 +1,7 @@
 import os
 import re
+from abc import ABC, abstractmethod
+from glob import glob
 from tkinter import font
 from typing import List
 
@@ -10,18 +12,17 @@ from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
 from requests import get
 from requests.exceptions import ConnectionError
-from abc import ABC, abstractmethod
 
 from app.__colors__ import blue, grey, light_blue, white
 from app.frames.clima import Station
 from app.frames.messagebox import box
-from app.utils import logger
+from app.utils import Fonts, logger
 from app.utils.date_utils import TODAY, TOMORROW, YESTERDAY, date2str, tomorrow2str
 from app.utils.taf_model import TAF
 from app.utils.winds_model import Wind
-from app.utils import Fonts
 
 fonts = Fonts()
+
 
 def view_creator(func):
     template_path = "assets/img/template.png"
@@ -49,9 +50,7 @@ def view_creator(func):
     return wrapper
 
 
-def _make_title(
-    draw: ImageDraw.Draw, text: str, x=0, y=90, color=light_blue
-):
+def _make_title(draw: ImageDraw.Draw, text: str, x=0, y=90, color=light_blue):
     logger.info(f"Making image title {text[:10]}...")
     text = text.center(46, " ")
     draw.text((x, y), text, font=fonts.title, fill=color)
@@ -235,29 +234,54 @@ def create_volcanic_ash(*args, **kwargs):
 
     box_params = ["okcancel", "Faltan imágenes."]
     with_errors = False
-    try:
-        _paste_vash_img(img, 1, name, dirname)
-    except FileNotFoundError as e:
-        result = box(*box_params, e)
-        if result:
-            logger.info("User choose to continue creating view with errors.")
-            with_errors = True
-        else:
-            logger.info("User choose to stop creating report.")
-            return
+    images = glob(f"images/volcanoes/{dirname}/*")
 
-    try:
-        _paste_vash_img(
-            img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700)
+    if len(images) == 6:
+        logger.warning(
+            f"6 images found in images/volcanoes/{dirname}. Only one will be pasted."
         )
-    except FileNotFoundError as e:
-        result = box(*box_params, e)
-        if result:
-            logger.info("User choose to continue creating view with errors.")
-            with_errors = True
-        else:
-            logger.info("User choose to stop creating report.")
-            return
+        try:
+            _paste_vash_img(img, 1, name, dirname, paste_pos=(775, 550))
+        except FileNotFoundError as e:
+            result = box(*box_params, e)
+            if result:
+                logger.info("User choose to continue creating view with errors.")
+                with_errors = True
+            else:
+                logger.info("User choose to stop creating report.")
+                return
+    elif len(images) == 7:
+        logger.warning(
+            f"7 images found in images/volcanoes/{dirname}. Two will be pasted."
+        )
+        try:
+            _paste_vash_img(img, 1, name, dirname)
+        except FileNotFoundError as e:
+            result = box(*box_params, e)
+            if result:
+                logger.info("User choose to continue creating view with errors.")
+                with_errors = True
+            else:
+                logger.info("User choose to stop creating report.")
+                return
+
+        try:
+            _paste_vash_img(
+                img, 2, name, dirname, img_size=(850, 797), paste_pos=(1230, 700)
+            )
+        except FileNotFoundError as e:
+            result = box(*box_params, e)
+            if result:
+                logger.info("User choose to continue creating view with errors.")
+                with_errors = True
+            else:
+                logger.info("User choose to stop creating report.")
+                return
+    else:
+        result = box(
+            *box_params,
+            f"No se encuentran las imágenes para el volcán {name}. No se creará la imagen.",
+        )
 
     if with_errors:
         result = box(
@@ -380,9 +404,7 @@ def create_taf(*args, **kwargs):
         y_text = 420
         for taf in tafs:
             taf = TAF(taf)
-            pxls = _make_text(
-                draw, taf.formated, x=100, y=y_text, just=False
-            )
+            pxls = _make_text(draw, taf.formated, x=100, y=y_text, just=False)
             y_text += pxls + 35
         return "ok"
 
@@ -521,9 +543,7 @@ def _get_winds_data():
     return winds
 
 
-def _write_winds_on_table(
-    draw: ImageDraw.Draw, winds: dict
-):
+def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict):
     x = 400
     y = 450
     for stn, wind in winds.items():
@@ -538,7 +558,7 @@ def _write_winds_on_table(
                 x=x + _x + 10,
                 y=y + _y,
                 color=white,
-                font=fonts.table
+                font=fonts.table,
             )
             _y += 75
             _make_text(draw, time, x=x + _x, y=y + _y, color=white, font=fonts.table)
@@ -546,7 +566,13 @@ def _write_winds_on_table(
             for level in [300, 400, 500, 700, 850, 925]:
                 text = wind.values(time, level)
                 _make_text(
-                    draw, text, x=x + _x, y=y + _y, color=blue, just=False, font=fonts.table
+                    draw,
+                    text,
+                    x=x + _x,
+                    y=y + _y,
+                    color=blue,
+                    just=False,
+                    font=fonts.table,
                 )
                 _y += 151
             _x += 113
@@ -650,7 +676,7 @@ def _write_clima_table_text(
             y=y_top,
             just=False,
             color=blue,
-            font=fonts.table
+            font=fonts.table,
         )
         _make_text(
             draw,
@@ -659,7 +685,7 @@ def _write_clima_table_text(
             y=y_top,
             just=False,
             color=blue,
-            font=fonts.table
+            font=fonts.table,
         )
         _make_text(
             draw,
@@ -668,7 +694,7 @@ def _write_clima_table_text(
             y=y_top,
             just=False,
             color=blue,
-            font=fonts.table
+            font=fonts.table,
         )
         y_top += 100
 
@@ -687,9 +713,7 @@ def _write_ephemeris(
         y=1000,
         font=fonts.subtitle,
     )
-    _make_text(
-        draw, "Salida de mañana", color=blue, just=False, x=250, y=1100
-    )
+    _make_text(draw, "Salida de mañana", color=blue, just=False, x=250, y=1100)
     _make_text(draw, "Puesta de hoy", color=blue, just=False, x=775, y=1100)
 
     sunrise = Image.open("assets/img/sunrise.png")

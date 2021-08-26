@@ -9,7 +9,7 @@ from PIL import ImageFont
 
 from app.__colors__ import light_blue, white
 from app.__version__ import version
-from app.frames import Climatology, Ephemeris, Header, SelectUser, box, Footer
+from app.frames import Climatology, Ephemeris, Footer, Header, SelectUser, box
 from app.utils import MONTHS, TODAY, VOLCANOES, date2str, extract, logger
 from app.utils.create_view import (
     create_clima,
@@ -73,7 +73,9 @@ class App(tk.Tk):
 
         # Footer buttons
         logger.info("Creating the bottom buttons.")
-        Footer(master=self, create_command=self._create_report, exit_command=self.destroy)
+        Footer(
+            master=self, create_command=self._create_report, exit_command=self.destroy
+        )
 
         self._delete_images()
 

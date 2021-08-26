@@ -7,5 +7,5 @@ from app.utils.date_utils import (
     tomorrow2str,
 )
 from app.utils.docx2img import VOLCANOES, extract
-from app.utils.logger_model import logger
 from app.utils.font_model import Fonts
+from app.utils.logger_model import logger
