@@ -1,3 +1,12 @@
+## 2.0.1
+
+- Fix trend docx file with incorrect format stop execution of the app.
+- Launch a message box if trend docx file has incorrect format.
+
+## 2.0.0
+
+- Some fixes solved.
+
 ## 2.0.0-rc2
 
 - "Release candidate 2"
