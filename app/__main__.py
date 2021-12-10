@@ -149,8 +149,16 @@ class App(tk.Tk):
 
         # create aerodromes trend views
         logger.info("Creating the trend views.")
-        create_trend01("02_trend.png", **data)
-        create_trend02("03_trend.png", **data)
+        try:
+            create_trend01("02_trend.png", **data)
+            create_trend02("03_trend.png", **data)
+        except IndexError as e:
+            box(
+                "error",
+                f"AeroInformes - {version}",
+                "Archivo de Tendencia de Aeropuertos no contiene el formato esperado.",
+            )
+            return
 
         # create volcanic ash forecast views
         logger.info("Creating the volcanic ash views.")

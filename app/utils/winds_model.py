@@ -68,7 +68,7 @@ class Wind:
                 return key
 
         return None
-    
+
     def _magnitude(self, u, v):
         return sqrt(u ** 2 + v ** 2)
 
@@ -77,7 +77,7 @@ class Wind:
         v = self._v.component(time, level)
 
         speed = "{:.0f}".format(self._magnitude(u, v))
-        
+
         direction = self._direction(u, v, speed)
         direction = direction.center(3, " ")
         speed = speed.center(3, " ")
