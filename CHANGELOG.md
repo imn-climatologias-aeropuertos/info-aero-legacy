@@ -1,3 +1,8 @@
+## 2.0.2
+
+- Fix no images found error when .docx ash files have less images that expected.
+- Remove kchaves and fgonzalez users, add pcastro and jvillarreal new users.
+
 ## 2.0.1
 
 - Fix trend docx file with incorrect format stop execution of the app.
