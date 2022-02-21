@@ -204,9 +204,10 @@ def _paste_vash_img(
         try:
             img_path = f"images/volcanoes/{dirname}/image{img_num}{fmt}"
             logger.info(f"Try to open volcanic ash image: {img_path}")
+            print(img_path)
             ash_img = Image.open(img_path)
         except FileNotFoundError as e:
-            logger.error(f"{e}")
+            logger.debug(f"{e}")
             continue
         else:
             logger.info(f"Volcanic ash image found: {img_path}")
@@ -217,7 +218,7 @@ def _paste_vash_img(
 
     if not found:
         msg = f"No se encuentra la imagen {img_num} del Volcán {name.title()}."
-        logger.error(f"Raising FileNotFoundError: {msg}")
+        logger.debug(f"Raising FileNotFoundError: {msg}")
         raise FileNotFoundError(msg)
 
 
@@ -250,7 +251,7 @@ def create_volcanic_ash(*args, **kwargs):
             else:
                 logger.info("User choose to stop creating report.")
                 return
-    elif len(images) == 7:
+    elif len(images) in [5, 7]:
         logger.warning(
             f"7 images found in images/volcanoes/{dirname}. Two will be pasted."
         )
