@@ -16,7 +16,7 @@ USERS = [
     ),
     User("Priscilla Castro", "pcastro", "PC", "1"),
     User("Raquel Salazar", "rsalazar", "RS", "2"),
-    User("Jazmín Villarreal", "jvillarreal", "FG", "3"),
+    User("Jazmín Villarreal", "jvillarreal", "JV", "3"),
     User("Otro usuario", "", "", "4"),
 ]
 
