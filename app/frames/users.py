@@ -14,9 +14,9 @@ USERS = [
         "MJ",
         "0",
     ),
-    User("Karla Chaves", "kchaves", "KC", "1"),
+    User("Priscilla Castro", "pcastro", "PC", "1"),
     User("Raquel Salazar", "rsalazar", "RS", "2"),
-    User("Felipe González", "fgonzalez", "FG", "3"),
+    User("Jazmín Villarreal", "jvillarreal", "FG", "3"),
     User("Otro usuario", "", "", "4"),
 ]
 
