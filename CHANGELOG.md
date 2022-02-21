@@ -1,3 +1,7 @@
+# 2.0.3
+
+- Fix initial letter for Jazmin Villarreal user"
+
 ## 2.0.2
 
 - Fix no images found error when .docx ash files have less images that expected.
