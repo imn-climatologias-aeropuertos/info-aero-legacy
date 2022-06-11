@@ -1,3 +1,10 @@
+# 2.1.0
+
+- Remove Jazmín Villarreal user.
+- Add Paula Campos user.
+- Now other user may put two or three last names.
+- New log.info when program can't find match in volcano ash files.
+
 # 2.0.3
 
 - Fix initial letter for Jazmin Villarreal user"
