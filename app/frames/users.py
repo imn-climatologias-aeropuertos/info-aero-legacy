@@ -5,19 +5,21 @@ from tkinter import Entry, Frame, Label, Radiobutton, StringVar
 from app.__colors__ import blue, light_blue, white
 from app.utils import logger
 
-User = namedtuple("User", "name email abbr value")
+User = namedtuple("User", "name lname1 lname2 email abbr value")
 
 USERS = [
     User(
-        "Mónica Jiménez",
+        "Mónica",
+        "Jiménez",
+        "Murillo",
         "mjimenez",
         "MJ",
         "0",
     ),
-    User("Priscilla Castro", "pcastro", "PC", "1"),
-    User("Raquel Salazar", "rsalazar", "RS", "2"),
-    User("Jazmín Villarreal", "jvillarreal", "JV", "3"),
-    User("Otro usuario", "", "", "4"),
+    User("Priscilla", "Castro", "Víquez", "pcastro", "PC", "1"),
+    User("Raquel", "Salazar", "Víquez", "rsalazar", "RS", "2"),
+    User("Paula", "Campos", "Zúñiga", "pcampos", "PC", "3"),
+    User("Otro usuario", "", "", "", "", "4"),
 ]
 
 
@@ -127,7 +129,7 @@ class SelectUser(Frame):
                 pady = self._pady
             rbtn = Radiobutton(
                 self.data,
-                text=user.name,
+                text=f"{user.name} {user.lname1}",
                 variable=self.rbtn_value,
                 value=user.value,
                 bg=white,
@@ -147,10 +149,19 @@ class SelectUser(Frame):
             return USERS[user_index]
 
         # create other user and return
-        other_user = self.other_user.get_values()
-        if len(other_user[1]) == 0:
-            raise IndexError
-        other_user = list(other_user)
-        other_user[1] = re.sub(r"@.+", "", other_user[1])
-        other_abbr = "".join(el[0].upper() for el in other_user[0].split(" "))
+        name, email = self.other_user.get_values()
+        if len(email) == 0:
+            raise ValueError("Other user email must be not empty")
+        
+        list_name = name.split(" ")
+        if len(list_name) == 1:
+            raise ValueError("Please supply at least one last name")
+        elif len(list_name) == 2:
+            list_name.append("")
+            
+        other_user = list(list_name)
+        other_user.append(email)
+        other_user[-1] = re.sub(r"@.+", "", other_user[-1])
+        print(other_user)
+        other_abbr = "".join(el[0].upper() for el in other_user[:2])
         return User(*other_user, other_abbr, "4")

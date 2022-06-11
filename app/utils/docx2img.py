@@ -37,4 +37,4 @@ def extract(docx_list):
                 logger.info(f"File {fl} processed.")
                 break
             else:
-                logger.log(f"No match with {volcano.name}, file {fl}")
+                logger.info(f"No match with {volcano.name}, file {fl}")

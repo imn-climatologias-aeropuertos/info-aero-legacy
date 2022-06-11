@@ -95,12 +95,12 @@ class App(tk.Tk):
         logger.info("Start creating report.")
         try:
             user = self.select_user.get_user()
-        except IndexError as e:
+        except ValueError as e:
             logger.error(f"Select user error. {e}.")
             box(
                 "error",
                 "Error al procesar usuario.",
-                "Seleccionó otro usuario, pero no escribió su nombre y/o usuario de correo institucional.",
+                "Seleccionó otro usuario, pero no escribió su nombre con al menos un apellido y/o usuario de correo institucional.",
             )
             return
 
@@ -139,7 +139,7 @@ class App(tk.Tk):
             "docx": docx,
             "clima": self.clima.stations,
             "ephemeris": self.ephemeris.get_ephemeris_time(),
-            "user": (user.name, user.email),
+            "user": (f"{user.name} {user.lname1} {user.lname2}".rstrip(), user.email),
         }
 
         logger.info("Start creating the views.")
