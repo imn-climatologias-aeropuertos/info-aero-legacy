@@ -1,3 +1,9 @@
+# 2.1.1
+
+- Fix repeated user abbreviation in final PDF files for Priscilla Castro and
+  Paula Campos.
+- Now all user abbreviations have three characters.
+
 # 2.1.0
 
 - Remove Jazmín Villarreal user.

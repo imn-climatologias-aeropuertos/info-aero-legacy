@@ -13,12 +13,12 @@ USERS = [
         "Jiménez",
         "Murillo",
         "mjimenez",
-        "MJ",
+        "MJM",
         "0",
     ),
-    User("Priscilla", "Castro", "Víquez", "pcastro", "PC", "1"),
-    User("Raquel", "Salazar", "Víquez", "rsalazar", "RS", "2"),
-    User("Paula", "Campos", "Zúñiga", "pcampos", "PC", "3"),
+    User("Priscilla", "Castro", "Víquez", "pcastro", "PCV", "1"),
+    User("Raquel", "Salazar", "Víquez", "rsalazar", "RSV", "2"),
+    User("Paula", "Campos", "Zúñiga", "pcampos", "PCZ", "3"),
     User("Otro usuario", "", "", "", "", "4"),
 ]
 
@@ -162,6 +162,5 @@ class SelectUser(Frame):
         other_user = list(list_name)
         other_user.append(email)
         other_user[-1] = re.sub(r"@.+", "", other_user[-1])
-        print(other_user)
-        other_abbr = "".join(el[0].upper() for el in other_user[:2])
+        other_abbr = "".join(el[0].upper() for el in list_name)
         return User(*other_user, other_abbr, "4")
