@@ -18,7 +18,7 @@ USERS = [
     ),
     User("Priscilla", "Castro", "Víquez", "pcastro", "PCV", "1"),
     User("Raquel", "Salazar", "Víquez", "rsalazar", "RSV", "2"),
-    User("Paula", "Campos", "Zúñiga", "pcampos", "PCZ", "3"),
+    User("Karla", "Chaves", "Hidalgo", "kchaves", "KCH", "3"),
     User("Otro usuario", "", "", "", "", "4"),
 ]
 
@@ -152,13 +152,13 @@ class SelectUser(Frame):
         name, email = self.other_user.get_values()
         if len(email) == 0:
             raise ValueError("Other user email must be not empty")
-        
+
         list_name = name.split(" ")
         if len(list_name) == 1:
             raise ValueError("Please supply at least one last name")
         elif len(list_name) == 2:
             list_name.append("")
-            
+
         other_user = list(list_name)
         other_user.append(email)
         other_user[-1] = re.sub(r"@.+", "", other_user[-1])
