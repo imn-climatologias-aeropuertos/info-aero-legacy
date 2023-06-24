@@ -2,7 +2,6 @@ from PIL import ImageFont
 
 
 class Fonts:
-
     font_path = "assets/fonts/DejaVuSansMono.ttf"
 
     def __init__(self):

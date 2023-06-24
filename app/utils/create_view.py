@@ -140,7 +140,7 @@ def create_trend01(*args, **kwargs):
     text = TrendText(docx)
     _make_title(draw, text.title)
     _make_subtitle(draw, text.subtitle)
-    _ = _make_text(draw, text.valid, x=700)
+    _ = _make_text(draw, text.valid.center(70))
 
     y_text = 500
     _ = _make_text(draw, text.general[0], y=y_text, color=light_blue)
@@ -166,7 +166,7 @@ def create_trend02(*args, **kwargs):
     text = TrendText(kwargs.get("docx"))
     _make_title(draw, text.title)
     _make_subtitle(draw, text.subtitle)
-    _ = _make_text(draw, text.valid, x=700)
+    _ = _make_text(draw, text.valid.center(70))
 
     y_text = 450
     _ = _make_text(draw, text.aerodromes[2], y=y_text, color=light_blue)
@@ -468,10 +468,10 @@ def _write_winds_table_text(draw: ImageDraw.Draw):
     )
     note = justify(note, 84)
     draw.text(
-        (150, 1720),
+        (150, 1640),
         "\n".join(note),
         font=fonts.note,
-        fill=white,
+        fill=blue,
     )
 
     levels = [
