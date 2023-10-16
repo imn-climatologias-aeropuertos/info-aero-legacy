@@ -1,4 +1,4 @@
-# 2.1.2
+# 2.2.1
 
 - Fix incorrect volcanoes images count for new files format oct 2023. 
 
