@@ -1,3 +1,7 @@
+# 2.1.2
+
+- Fix incorrect volcanoes images count for new files format oct 2023. 
+
 # 2.1.1
 
 - Fix repeated user abbreviation in final PDF files for Priscilla Castro and
