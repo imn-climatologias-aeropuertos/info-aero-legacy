@@ -22,9 +22,7 @@ class Header(Frame):
         logger.info(f"Creating header widgets.")
         # set the imn logo
         self.imn = ImageTk.PhotoImage(
-            Image.open("assets/img/logo_imn.png").resize(
-                self._image_size(3.6), Image.ANTIALIAS
-            )
+            Image.open("assets/img/logo_imn.png").resize(self._image_size(3.6))
         )
         self.logo_imn = Label(self, image=self.imn, bd=0)
         self.logo_imn.grid(row=0, column=0, pady=10)
@@ -44,7 +42,7 @@ class Header(Frame):
         # set the minae logo
         self.minae = ImageTk.PhotoImage(
             Image.open("assets/img/logo_minae.png").resize(
-                self._image_size(3, height_cut=30), Image.ANTIALIAS
+                self._image_size(3, height_cut=30)
             )
         )
         self.logo_minae = Label(self, image=self.minae, bd=0, bg=white)

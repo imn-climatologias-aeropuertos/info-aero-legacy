@@ -239,7 +239,7 @@ def create_volcanic_ash(*args, **kwargs):
 
     if len(images) == 6:
         logger.warning(
-            f"6 images found in images/volcanoes/{dirname}. Only one will be pasted."
+            f"less images than expected found in images/volcanoes/{dirname}. Only one will be pasted."
         )
         try:
             _paste_vash_img(img, 1, name, dirname, paste_pos=(775, 550))
@@ -251,9 +251,9 @@ def create_volcanic_ash(*args, **kwargs):
             else:
                 logger.info("User choose to stop creating report.")
                 return
-    elif len(images) in [5, 7]:
+    elif len(images) in [4, 7]:
         logger.warning(
-            f"7 images found in images/volcanoes/{dirname}. Two will be pasted."
+            f"correct number of images found in images/volcanoes/{dirname}. Two will be pasted."
         )
         try:
             _paste_vash_img(img, 1, name, dirname)
@@ -281,7 +281,7 @@ def create_volcanic_ash(*args, **kwargs):
     else:
         result = box(
             *box_params,
-            f"No se encuentran las imágenes para el volcán {name}. No se creará la imagen.",
+            f"No se encuentra la cantidad correcta de imágenes para el volcán {name}. No se creará la imagen.",
         )
 
     if with_errors:
