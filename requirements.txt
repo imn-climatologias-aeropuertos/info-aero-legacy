@@ -1,36 +1,22 @@
-altgraph==0.17.2
-appdirs==1.4.4
-beautifulsoup4==4.11.1
-black==21.6b0
-bump2version==1.0.1
-certifi==2022.5.18.1
-charset-normalizer==2.0.12
-click==8.1.3
+-i https://pypi.org/simple
+beautifulsoup4==4.12.2; python_full_version >= '3.6.0'
+certifi==2023.7.22; python_version >= '3.6'
+charset-normalizer==3.3.0; python_full_version >= '3.7.0'
+deprecation==2.1.0
 docx2txt==0.8
-idna==3.3
+idna==3.4; python_version >= '3.5'
 img2pdf==0.4.4
-importlib-metadata==4.11.4
-isort==5.10.1
-JustifyText==0.2.1.post3
-lxml==4.9.0
-mypy-extensions==0.4.3
-packaging==21.3
-pathspec==0.9.0
-pikepdf==5.1.5
-Pillow==9.1.1
-pyinstaller==5.1
-pyinstaller-hooks-contrib==2022.7
-pyparsing==3.0.9
-python-dateutil==2.8.2
-python-docx==0.8.11
-pytz==2022.1
-regex==2022.6.2
-requests==2.28.0
-six==1.16.0
-soupsieve==2.3.2.post1
+justifytext==0.2.1.post3
+lxml==4.9.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
+packaging==23.2; python_version >= '3.7'
+pikepdf==8.5.1; python_version >= '3.8'
+pillow==10.1.0; python_version >= '3.8'
+python-dateutil==2.8.2; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+python-docx==1.0.1; python_version >= '3.7'
+pytz==2023.3.post1
+requests==2.31.0; python_version >= '3.7'
+six==1.16.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+soupsieve==2.5; python_version >= '3.8'
 suntime==1.2.5
-toml==0.10.2
-typed-ast==1.5.4
-typing_extensions==4.2.0
-urllib3==1.26.9
-zipp==3.8.0
+typing-extensions==4.8.0; python_version >= '3.8'
+urllib3==2.0.6; python_version >= '3.7'
