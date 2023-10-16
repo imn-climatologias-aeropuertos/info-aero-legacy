@@ -15,6 +15,7 @@ requests = "*"
 img2pdf = "*"
 pytz = "*"
 beautifulsoup4 = "*"
+bump2version = "*"
 
 [dev-packages]
 isort = "*"
