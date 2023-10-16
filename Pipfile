@@ -2,7 +2,7 @@
 url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
-version = "2.2.0"
+version = "2.2.1"
 description = "Simple GUI for creating aeronautical-meteorological report from MRPV"
 
 [packages]
