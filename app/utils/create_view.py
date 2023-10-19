@@ -330,6 +330,9 @@ def _taf_from_ogimet():
     )
 
     res = get(url)
+    if res.status_code != 200:
+        raise ConnectionError
+
     taf_found = False
     taf = []
     for line in res.text.split("\n"):
@@ -351,6 +354,8 @@ BASE_URL_ADDS = "https://www.aviationweather.gov/taf/data?ids=MROC+MRLB+MRLM+MRP
 def _taf_from_adds():
     tafs = []
     res = get(BASE_URL_ADDS)
+    if res.status_code == 404:
+        raise ConnectionError
     soup = BeautifulSoup(res.text, "html.parser")
 
     for taf in soup.find_all("code"):
