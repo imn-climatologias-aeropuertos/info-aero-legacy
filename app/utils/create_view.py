@@ -348,18 +348,41 @@ def _taf_from_ogimet():
     return tafs
 
 
-BASE_URL_ADDS = "https://www.aviationweather.gov/taf/data?ids=MROC+MRLB+MRLM+MRPV&format=raw&date=&submit=Get+TAF+data"
+BASE_URL_ADDS = "https://aviationweather.gov/cgi-bin/data/taf.php?ids=MROC%2CMRLB%2CMRLM%2CMRPV&sep=true"
 
 
 def _taf_from_adds():
-    tafs = []
     res = get(BASE_URL_ADDS)
-    if res.status_code == 404:
+    if res.status_code != 200:
         raise ConnectionError
-    soup = BeautifulSoup(res.text, "html.parser")
 
-    for taf in soup.find_all("code"):
-        tafs.append(taf.getText())
+    text = res.text
+    text = text.strip()
+    text = re.sub(r"\s+?TAF\s+?|\s+?\n+\s+?", " ", text)
+    text = re.sub(r"\s{2,}", " ", text)
+    tafs = text.split("MR")[1:]
+    tafs = ["MR" + taf.strip() for taf in tafs]
+
+    return tafs
+
+
+def _taf_from_noaa():
+    stations = ["MROC", "MRLB", "MRLM", "MRPV"]
+    tafs = []
+
+    for station in stations:
+        URL = f"https://tgftp.nws.noaa.gov/data/forecasts/taf/stations/{station}.TXT"
+
+        res = get(URL)
+        if res.status_code != 200:
+            raise ConnectionError
+
+        text = res.text
+        text = text.strip()
+        text = re.sub(r"\s+?TAF\s+?|\s+?\n+\s+?", " ", text)
+        text = re.sub(r"\s{2,}", " ", text)
+        text = text[17:]
+        tafs.append(text)
 
     return tafs
 
@@ -383,24 +406,29 @@ def create_taf(*args, **kwargs):
 
     with_errors = False
     try:
-        logger.info("Try get TAF from ADDS.")
-        tafs = _taf_from_adds()
+        logger.info("Try get TAF from NOAA.")
+        tafs = _taf_from_noaa()
     except ConnectionError as e:
-        logger.error("ConnectionError: {e}.")
+        logger.error(f"ConnectionError: {e}")
         try:
-            logger.info("Try get TAF from Ogimet.")
-            tafs = _taf_from_ogimet()
+            logger.info("Try get TAF from ADDS.")
+            tafs = _taf_from_adds()
         except ConnectionError as e:
-            logger.error("ConnectionError: {e}.")
-            result = box(
-                "okcancel",
-                "Error de conexión.",
-                "No se puede acceder a los TAF. ¿Desea continuar? Se omitirá esta imagen.",
-            )
-            if result:
-                with_errors = True
-            else:
-                return
+            logger.error(f"ConnectionError: {e}.")
+            try:
+                logger.info("Try get TAF from Ogimet.")
+                tafs = _taf_from_ogimet()
+            except ConnectionError as e:
+                logger.error(f"ConnectionError: {e}.")
+                result = box(
+                    "okcancel",
+                    "Error de conexión.",
+                    "No se puede acceder a los TAF. ¿Desea continuar? Se omitirá esta imagen.",
+                )
+                if result:
+                    with_errors = True
+                else:
+                    return
 
     if with_errors:
         logger.info("User choose do not save TAF view.")
