@@ -1,6 +1,11 @@
+# 2.2.3
+
+- Fix no TAF requested from ADDS web site due to change of response.
+- Add method to get TAFs from NOAA, now is the method by default.
+
 # 2.2.2
 
-- Fix no TAF requested from ADDS web site
+- Fix no TAF requested from ADDS web site.
 
 # 2.2.1
 
