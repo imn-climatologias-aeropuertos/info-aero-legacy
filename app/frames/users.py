@@ -18,7 +18,7 @@ USERS = [
     ),
     User("Priscilla", "Castro", "Víquez", "pcastro", "PCV", "1"),
     User("Raquel", "Salazar", "Víquez", "rsalazar", "RSV", "2"),
-    User("Karla", "Chaves", "Hidalgo", "kchaves", "KCH", "3"),
+    User("Kenneth", "Chaves", "Cruz", "kchavesc", "KCC", "3"),
     User("Otro usuario", "", "", "", "", "4"),
 ]
 
