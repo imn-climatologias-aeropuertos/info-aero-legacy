@@ -1,3 +1,7 @@
+# 2.2.4
+
+- Fix URL to winds data from WRF1-5, because change from http to https.
+
 # 2.2.3
 
 - Fix no TAF requested from ADDS web site due to change of response.

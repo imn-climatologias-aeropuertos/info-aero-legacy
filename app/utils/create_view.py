@@ -522,10 +522,10 @@ def _write_winds_table_text(draw: ImageDraw.Draw):
 
 
 BASE_WINDS_U_URL = (
-    "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_U.txt"
+    "https://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_U.txt"
 )
 BASE_WINDS_V_URL = (
-    "http://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_V.txt"
+    "https://wrf1-5.imn.ac.cr/modelo/informe_aeronautico/salidas/informe_{}_V.txt"
 )
 
 
