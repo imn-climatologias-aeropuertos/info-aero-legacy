@@ -68,9 +68,9 @@ class Hour(Frame):
         tzone = tz.gettz("America/Costa_Rica")
 
         if self.ephem == "sunrise":
-            d = sun.get_local_sunrise_time(date=TOMORROW, local_time_zone=tzone)
+            d = sun.get_local_sunrise_time(at_date=TOMORROW, time_zone=tzone)
         else:
-            d = sun.get_local_sunset_time(date=TODAY, local_time_zone=tzone)
+            d = sun.get_local_sunset_time(at_date=TODAY, time_zone=tzone)
 
         self.date = d
 
