@@ -25,8 +25,5 @@ black = "*"
 bump2version = "*"
 pyinstaller = "*"
 
-[requires]
-python_version = "3.11"
-
 [pipenv]
 allow_prereleases = true
