@@ -9,7 +9,17 @@ Solo descarge el archivo comprimido que se le proporciona, descomprima en donde 
 Una vez descomprimido encontrará un archivo ejecutable para su sistema operativo. Ejecute dicho archivo
 y se abrirá una ventana para seleccionar y editar las opciones que desee.
 
-### Requisitos de los archivos de MS Office Word
+### Agregar Mapa SIGWX
+
+Siempre debe agregar el mapa SIGWX de niveles bajos generado por la oficina del Aeropuerto de Pavas.
+En caso de no hacerlo y proceder a crear el informe, `AeroInformes` le avisará que falta al pulsar el
+botón `Crear Informe`. 
+
+Para agregar el mapa SIGWX solamente pulse el botón `Agregar Mapa`, se le desplegará una ventana de navegación
+de archivos donde deberá buscar la ruta donde se encuentra el mapa que desea agregar. Seleccione el mapa y
+pulse el botón `Abrir` de la ventana de navegación.
+
+### Agregar los archivos de Dispersión de Ceniza
 
 Los archivos de MS Office deben respetar cierto formato debido al espacio limitado con el que se cuenta.
 En el caso del documento de la `Tendencia de Aeropuertos`, cada aeropuerto debe tener su comentario, 
@@ -20,13 +30,12 @@ comentarios, agregue el texto que desee, se recomienda: **No hay datos para este
 También, asegúrese de que los documentos disponibles de `Dispersión de Ceniza` cuenten con al menos una
 imagen.
 
-**Nota:** Ahora puede agregar todos los archivos de MS Word o .docx juntos. Cuando presione el
-botón `Agregar .docx` se le abrirá una ventana de diálogo donde podrá navegar hasta la ruta donde se 
-encuentran los archivos. **Por esta razón se recomienda siempre tener todos los archivos de la ceniza 
-volcánica y la tendencia de aeropuertos en la misma carpeta,** ya que además, en esta versión esta es la 
-única manera de adjuntar estos archivos. Tenga cuidado de no adjuntar más archivos de la cuenta, o de 
-adjuntar dos archivos para el mismo volcán, ya que las imágenes extraidas desde uno de los archivos serán 
-sobreescritas por el otro.
+Puede agregar todos los archivos de MS Word o .docx juntos. Cuando presione el botón `Agregar .docx` se
+le abrirá una ventana de diálogo donde podrá navegar hasta la ruta donde se encuentran los archivos.
+**Por esta razón se recomienda siempre tener todos los archivos de la ceniza volcánica y la tendencia de
+aeropuertos en la misma carpeta**, ya que además, en esta versión esta es la única manera de adjuntar
+estos archivos. Tenga cuidado de no adjuntar más archivos de la cuenta, o de adjuntar dos archivos para
+el mismo volcán, ya que las imágenes extraidas desde uno de los archivos serán sobreescritas por el otro.
 
 ### Agregar otro usuario
 
