@@ -1,5 +1,5 @@
 # AeroInformes
-## Version 2.2.4
+## Version 2.2.5
 
 Una aplicación para generar los informes de meteorología aeronáutica del DMSA.
 
