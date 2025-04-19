@@ -561,8 +561,8 @@ def _get_winds_data():
         v_url = BASE_WINDS_V_URL.format(stn)
         try:
             logger.info(f"Try get winds data for station {stn}.")
-            u_res = get(u_url)
-            v_res = get(v_url)
+            u_res = get(u_url, verify=False)
+            v_res = get(v_url, verify=False)
         except ConnectionError as e:
             logger.error(f"ConnectionError with winds source for {stn}: {e}.")
             result = box(

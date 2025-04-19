@@ -1,3 +1,7 @@
+# 2.2.5
+
+- Fix SSL verify fail for winds URL because of change from HTTP to HTTPS.
+
 # 2.2.4
 
 - Fix URL to winds data from WRF1-5, because change from http to https.
