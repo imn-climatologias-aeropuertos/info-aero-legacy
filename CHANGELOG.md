@@ -1,3 +1,7 @@
+# 2.2.6
+
+- Add HTTPError exception to winds view creation functions to manage this error types.
+
 # 2.2.5
 
 - Fix SSL verify fail for winds URL because of change from HTTP to HTTPS.
