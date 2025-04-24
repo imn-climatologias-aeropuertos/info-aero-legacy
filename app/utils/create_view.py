@@ -11,7 +11,7 @@ from docx import Document
 from justifytext import justify
 from PIL import Image, ImageDraw, ImageFont
 from requests import get
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, HTTPError
 
 from app.__colors__ import blue, grey, light_blue, white
 from app.frames.clima import Station
@@ -563,12 +563,15 @@ def _get_winds_data():
             logger.info(f"Try get winds data for station {stn}.")
             u_res = get(u_url, verify=False)
             v_res = get(v_url, verify=False)
-        except ConnectionError as e:
-            logger.error(f"ConnectionError with winds source for {stn}: {e}.")
+        except (ConnectionError, HTTPError) as e:
+            logger.error(
+                f"ConnectionError or HTTPError with winds source for {stn}: {e}."
+            )
             result = box(
                 "okcancel",
-                f"Error de conexión.",
-                f"No se puede conectar la petición de los datos de vientos en altura de {stn}. ¿Desea continuar?",
+                f"Error de conexión o error HTTP.",
+                f"No se puede completar la petición de los datos de vientos en altura de {stn}. "
+                f"\nError: {e}.\n¿Desea continuar?",
             )
             if not result:
                 raise
