@@ -1,4 +1,5 @@
-from app.utils.date_utils import (
+from .config import app_font, Colors
+from .date_utils import (
     MONTHS,
     TODAY,
     TOMORROW,
@@ -6,6 +7,6 @@ from app.utils.date_utils import (
     date2str,
     tomorrow2str,
 )
-from app.utils.docx2img import VOLCANOES, extract
-from app.utils.font_model import Fonts
-from app.utils.logger_model import logger
+from .docx2img import VOLCANOES, extract
+from .font_model import Fonts
+from .logger_model import logger

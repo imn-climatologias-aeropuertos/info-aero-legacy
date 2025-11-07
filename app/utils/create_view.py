@@ -1,19 +1,16 @@
 import os
 import re
-from abc import ABC, abstractmethod
 from glob import glob
-from tkinter import font
 from typing import List
 
 import pytz
-from bs4 import BeautifulSoup
 from docx import Document
 from justifytext import justify
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 from requests import get
 from requests.exceptions import ConnectionError, HTTPError
 
-from app.__colors__ import blue, grey, light_blue, white
+from app.utils import Colors
 from app.frames.clima import Station
 from app.frames.messagebox import box
 from app.utils import Fonts, logger
@@ -50,16 +47,16 @@ def view_creator(func):
     return wrapper
 
 
-def _make_title(draw: ImageDraw.Draw, text: str, x=0, y=90, color=light_blue):
+def _make_title(draw: ImageDraw.Draw, text: str, x=10, y=90, color=Colors.light_blue):
     logger.info(f"Making image title {text[:10]}...")
     text = text.center(46, " ")
     draw.text((x, y), text, font=fonts.title, fill=color)
 
 
-def _make_subtitle(draw: ImageDraw.Draw, text: str, x=400, y=210):
+def _make_subtitle(draw: ImageDraw.Draw, text: str, x=15, y=190):
     logger.info(f"Making image subtitle {text[:10]}...")
-    text = text.center(40, " ")
-    draw.text((x, y), text, font=fonts.subtitle, fill=light_blue)
+    text = text.center(58, " ")
+    draw.text((x, y), text, font=fonts.subtitle, fill=Colors.light_blue)
 
 
 def _make_text(
@@ -67,7 +64,7 @@ def _make_text(
     text: str,
     x=200,
     y=325,
-    color=blue,
+    color=Colors.black,
     font=fonts.text,
     just=True,
 ):
@@ -97,7 +94,7 @@ def create_map_img(*args, **kwargs):
     _make_subtitle(draw, date2str().capitalize())
     if TODAY.hour >= 11:
         logger.info(f"Adding 'ACTUALIZADO' label to report.")
-        _make_text(draw, "ACTUALIZADO", x=210, y=270, color=blue)
+        _make_text(draw, "ACTUALIZADO", x=210, y=270, color=Colors.black)
 
     logger.info(f"Adding SIGWX Map to image.")
     map_img = Image.open(map_img_path)
@@ -121,11 +118,11 @@ class TrendText:
         self.paragraphs = [
             p.text for p in self.document.paragraphs if not re.match(r"^\s*$", p.text)
         ]
-        self.title = self.paragraphs[0]
-        self.subtitle = self.paragraphs[1]
-        self.valid = self.paragraphs[2]
-        self.general = [p for p in self.paragraphs[3:5]]
-        self.aerodromes = [p for p in self.paragraphs[5:-1]]
+        self.title = self.paragraphs[0].strip()
+        self.subtitle = self.paragraphs[1].strip()
+        self.valid = self.paragraphs[2].strip()
+        self.general = [p.strip() for p in self.paragraphs[3:5]]
+        self.aerodromes = [p.strip() for p in self.paragraphs[5:-1]]
 
 
 @view_creator
@@ -143,11 +140,11 @@ def create_trend01(*args, **kwargs):
     _ = _make_text(draw, text.valid.center(70))
 
     y_text = 500
-    _ = _make_text(draw, text.general[0], y=y_text, color=light_blue)
+    _ = _make_text(draw, text.general[0], y=y_text, color=Colors.light_blue)
     y_text += 75
     pxls = _make_text(draw, text.general[1], y=y_text)
     y_text += pxls + 75
-    _ = _make_text(draw, text.aerodromes[0], y=y_text, color=light_blue)
+    _ = _make_text(draw, text.aerodromes[0], y=y_text, color=Colors.light_blue)
     y_text += 75
     _ = _make_text(draw, text.aerodromes[1], y=y_text)
 
@@ -169,15 +166,15 @@ def create_trend02(*args, **kwargs):
     _ = _make_text(draw, text.valid.center(70))
 
     y_text = 450
-    _ = _make_text(draw, text.aerodromes[2], y=y_text, color=light_blue)
+    _ = _make_text(draw, text.aerodromes[2], y=y_text, color=Colors.light_blue)
     y_text += 75
     pxls = _make_text(draw, text.aerodromes[3], y=y_text)
     y_text += pxls + 65
-    _ = _make_text(draw, text.aerodromes[4], y=y_text, color=light_blue)
+    _ = _make_text(draw, text.aerodromes[4], y=y_text, color=Colors.light_blue)
     y_text += 75
     pxls = _make_text(draw, text.aerodromes[5], y=y_text)
     y_text += pxls + 65
-    _make_text(draw, text.aerodromes[6], y=y_text, color=light_blue)
+    _make_text(draw, text.aerodromes[6], y=y_text, color=Colors.light_blue)
     y_text += 75
     _make_text(draw, text.aerodromes[7], y=y_text)
 
@@ -402,7 +399,7 @@ def create_taf(*args, **kwargs):
         subtitle = subtitle.format("12", tomorrow2str())
     else:
         subtitle = subtitle.format("06", tomorrow2str())
-    _make_text(draw, subtitle, x=330, y=280, color=light_blue, just=False)
+    _make_text(draw, subtitle, x=330, y=280, color=Colors.light_blue, just=False)
 
     with_errors = False
     try:
@@ -449,50 +446,50 @@ def create_taf(*args, **kwargs):
 
 
 def _draw_winds_table(draw: ImageDraw.Draw):
-    # light blue rectangle
-    draw.rectangle((400, 450, 2208, 700), fill=light_blue)
+    # light Colors.black rectangle
+    draw.rectangle((400, 450, 2208, 700), fill=Colors.light_blue)
 
-    # grey rectangles
+    # Colors.grey rectangles
     x_left = 400
     for i in range(2):
         x_right = x_left + 452
-        draw.rectangle((x_left, 700, x_right, 1606), fill=grey)
+        draw.rectangle((x_left, 700, x_right, 1606), fill=Colors.grey)
         x_left += 904
 
     # longest vertical lines
     x_left = 400
     for i in range(5):
-        draw.line((x_left, 448, x_left, 1608), fill=blue, width=5)
+        draw.line((x_left, 448, x_left, 1608), fill=Colors.black, width=5)
         x_left += 452
 
     # middle vertical lines
     x_left = 512
     for i in range(4):
         for j in range(3):
-            draw.line((x_left, 550, x_left, 1606), fill=blue, width=5)
+            draw.line((x_left, 550, x_left, 1606), fill=Colors.black, width=5)
             x_left += 113
         x_left += 113
 
-    # light blue rectanle horizontal lines
+    # light Colors.black rectanle horizontal lines
     y_top = 450
     for i in range(3):
         if i == 1:
             y_top += 25
-        draw.line((400, y_top, 2208, y_top), fill=blue, width=5)
+        draw.line((400, y_top, 2208, y_top), fill=Colors.black, width=5)
         y_top += 75
 
     # longest horizontal lines
     for i in range(7):
-        draw.line((148, y_top, 2210, y_top), fill=blue, width=5)
+        draw.line((148, y_top, 2210, y_top), fill=Colors.black, width=5)
         y_top += 151
     # most left vertical line
-    draw.line((150, 700, 150, 1606), fill=blue, width=5)
+    draw.line((150, 700, 150, 1606), fill=Colors.black, width=5)
 
 
 def _write_winds_table_text(draw: ImageDraw.Draw):
-    draw.text((210, 570), "Fecha", font=fonts.table, fill=blue)
-    draw.text((180, 640), "Hora UTC", font=fonts.table, fill=blue)
-    draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=fonts.table, fill=blue)
+    draw.text((210, 570), "Fecha", font=fonts.table, fill=Colors.black)
+    draw.text((180, 640), "Hora UTC", font=fonts.table, fill=Colors.black)
+    draw.text((90, 950), "N\n\nI\n\nV\n\nE\n\nL", font=fonts.table, fill=Colors.black)
 
     note = (
         "Nota: los datos aquí presentados corresponden al promedio de las 6 horas anteriores."
@@ -504,7 +501,7 @@ def _write_winds_table_text(draw: ImageDraw.Draw):
         (150, 1640),
         "\n".join(note),
         font=fonts.note,
-        fill=blue,
+        fill=Colors.black,
     )
 
     levels = [
@@ -517,7 +514,7 @@ def _write_winds_table_text(draw: ImageDraw.Draw):
     ]
     y_top = 730
     for level in levels:
-        draw.text((170, y_top), level, font=fonts.table, fill=blue)
+        draw.text((170, y_top), level, font=fonts.table, fill=Colors.black)
         y_top += 151
 
 
@@ -589,7 +586,7 @@ def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict):
     y = 450
     for stn, wind in winds.items():
         date = TODAY
-        _make_text(draw, stn, x=x + 130, y=y, color=white, font=fonts.title)
+        _make_text(draw, stn, x=x + 130, y=y, color=Colors.white, font=fonts.title)
         _x = 25
         for time in wind.hours:
             _y = 120
@@ -598,11 +595,13 @@ def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict):
                 "{:02d}".format(date.day),
                 x=x + _x + 10,
                 y=y + _y,
-                color=white,
+                color=Colors.white,
                 font=fonts.table,
             )
             _y += 75
-            _make_text(draw, time, x=x + _x, y=y + _y, color=white, font=fonts.table)
+            _make_text(
+                draw, time, x=x + _x, y=y + _y, color=Colors.white, font=fonts.table
+            )
             _y += 85
             for level in [300, 400, 500, 700, 850, 925]:
                 text = wind.values(time, level)
@@ -611,7 +610,7 @@ def _write_winds_on_table(draw: ImageDraw.Draw, winds: dict):
                     text,
                     x=x + _x,
                     y=y + _y,
-                    color=blue,
+                    color=Colors.black,
                     just=False,
                     font=fonts.table,
                 )
@@ -654,14 +653,14 @@ def create_winds(*args, **kwargs):
 
 
 def _draw_clima_table(draw: ImageDraw.Draw):
-    draw.rectangle((200, 350, 2200, 550), fill=light_blue)
+    draw.rectangle((200, 350, 2200, 550), fill=Colors.light_blue)
 
     # draw vertical lines
     x_left = 200
     for i in range(5):
         if i == 1:
             x_left += 200
-        draw.line((x_left, 350, x_left, 950), fill=blue, width=5)
+        draw.line((x_left, 350, x_left, 950), fill=Colors.black, width=5)
         x_left += 450
 
     # draw horizontal lines
@@ -670,7 +669,7 @@ def _draw_clima_table(draw: ImageDraw.Draw):
     for i in range(6):
         if i == 1:
             y_top += 100
-        draw.line((x_left, y_top, 2202, y_top), fill=blue, width=5)
+        draw.line((x_left, y_top, 2202, y_top), fill=Colors.black, width=5)
         y_top += 100
 
 
@@ -691,7 +690,7 @@ def _write_clima_table_text(
             x_left += 90
         if titles.index(title) == 3:
             x_left += 10
-        _make_text(draw, title, color=white, x=x_left, y=390, just=False)
+        _make_text(draw, title, color=Colors.white, x=x_left, y=390, just=False)
         x_left += 450
 
     y_top = 575
@@ -703,7 +702,9 @@ def _write_clima_table_text(
     ]
     for stn in stations:
         stn = stn.center(25, " ")
-        _make_text(draw, stn, color=blue, x=220, y=y_top, just=False, font=fonts.table)
+        _make_text(
+            draw, stn, color=Colors.black, x=220, y=y_top, just=False, font=fonts.table
+        )
         y_top += 100
 
     x_left = 1010
@@ -716,7 +717,7 @@ def _write_clima_table_text(
             x=x_left,
             y=y_top,
             just=False,
-            color=blue,
+            color=Colors.black,
             font=fonts.table,
         )
         _make_text(
@@ -725,7 +726,7 @@ def _write_clima_table_text(
             x=x_left + 450,
             y=y_top,
             just=False,
-            color=blue,
+            color=Colors.black,
             font=fonts.table,
         )
         _make_text(
@@ -734,7 +735,7 @@ def _write_clima_table_text(
             x=x_left + 900,
             y=y_top,
             just=False,
-            color=blue,
+            color=Colors.black,
             font=fonts.table,
         )
         y_top += 100
@@ -748,24 +749,24 @@ def _write_ephemeris(
     _make_text(
         draw,
         "Salida y Puesta del Sol",
-        color=blue,
+        color=Colors.black,
         just=False,
         x=250,
         y=1000,
         font=fonts.subtitle,
     )
-    _make_text(draw, "Salida de mañana", color=blue, just=False, x=250, y=1100)
-    _make_text(draw, "Puesta de hoy", color=blue, just=False, x=775, y=1100)
+    _make_text(draw, "Salida de mañana", color=Colors.black, just=False, x=250, y=1100)
+    _make_text(draw, "Puesta de hoy", color=Colors.black, just=False, x=775, y=1100)
 
     sunrise = Image.open("assets/img/sunrise.png")
     sunset = Image.open("assets/img/sunset.png")
     img.paste(sunrise, (250, 1180))
     img.paste(sunset, (735, 1180))
 
-    draw.rectangle((250, 1500, 1200, 1600), fill=light_blue)
+    draw.rectangle((250, 1500, 1200, 1600), fill=Colors.light_blue)
     x_left = 370
     for d in data:
-        _make_text(draw, d, color=white, x=x_left, y=1525)
+        _make_text(draw, d, color=Colors.white, x=x_left, y=1525)
         x_left += 500
 
 
@@ -778,7 +779,7 @@ def _write_user_data(draw: ImageDraw.Draw, data=("Name", "email@email.com")):
         "Telefax: (+506) 2232-2071\nWeb (IMN): www.imn.ac.cr",
     )
 
-    _make_text(draw, text.strip(), color=blue, x=1280, y=1200, just=False)
+    _make_text(draw, text.strip(), color=Colors.black, x=1280, y=1200, just=False)
 
 
 @view_creator

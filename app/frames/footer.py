@@ -1,6 +1,6 @@
 from tkinter import Button, Frame, Label
 
-from app.__colors__ import light_blue, white
+from app.utils import Colors
 
 
 class FooterButton(Button):
@@ -10,8 +10,8 @@ class FooterButton(Button):
             text=text,
             padx=20,
             pady=10,
-            fg=white,
-            bg=light_blue,
+            fg=Colors.white,
+            bg=Colors.light_blue,
             relief="flat",
             command=command,
         )
@@ -23,10 +23,10 @@ class Footer(Frame):
     def __init__(
         self, master=None, width=100, height=40, create_command=None, exit_command=None
     ):
-        super().__init__(master, bg=white)
+        super().__init__(master, bg=Colors.white)
 
         # make space between previous frame and footer
-        label = Label(self, width=10, height=0 - 5, bg=white)
+        label = Label(self, width=10, height=0 - 5, bg=Colors.white)
         label.grid(row=0, column=0)
 
         # create button

@@ -3,7 +3,7 @@ from tkinter import Entry, Frame, Label
 from dateutil import tz
 from suntime import Sun
 
-from app.__colors__ import blue, light_blue, white
+from app.utils import app_font as font, Colors
 from app.utils import TODAY, TOMORROW, logger
 
 
@@ -16,7 +16,7 @@ class Hour(Frame):
         height=10,
         row=0,
         column=0,
-        font_type="Verdana",
+        font_type=font,
         font_size=12,
         ephem="sunrise",
     ):
@@ -32,7 +32,7 @@ class Hour(Frame):
         self.column = column
         self._padx = 8
         self._pady = 6
-        self.config(bg=white, width=self.width, height=self.height)
+        self.config(bg=Colors.white, width=self.width, height=self.height)
         self.grid(row=self.row, column=self.column)
 
         logger.info("Creating ephemeris entries.")
@@ -49,8 +49,8 @@ class Hour(Frame):
         self.label = Label(
             self,
             text=self.text,
-            fg=light_blue,
-            bg=white,
+            fg=Colors.light_blue,
+            bg=Colors.white,
             font=(self.font_type, self.font_size),
             padx=self._padx,
             pady=self._pady,
@@ -58,7 +58,9 @@ class Hour(Frame):
         self.label.grid(row=0, column=0)
 
     def _entry(self):
-        self.entry = Entry(self, bg=white, bd=3, width=8, fg=blue, justify="center")
+        self.entry = Entry(
+            self, bg=Colors.white, bd=3, width=8, fg=Colors.black, justify="center"
+        )
         self.entry.grid(row=0, column=1)
         self.entry.insert(0, self.date.strftime("%I:%M %p"))
 
@@ -81,7 +83,7 @@ class Ephemeris(Frame):
         master=None,
         width=100,
         height=100,
-        font_type="Verdana",
+        font_type=font,
         big_font=16,
         small_font=12,
     ):
@@ -94,15 +96,15 @@ class Ephemeris(Frame):
         self.small_font = small_font
         self._padx = 8
         self._pady = 6
-        self.config(bg=white, width=self.width, height=self.height)
+        self.config(bg=Colors.white, width=self.width, height=self.height)
         self.pack()
 
         # Section title
         self.title = Label(
             self,
             text="SALIDA Y PUESTA DEL SOL",
-            fg=blue,
-            bg=white,
+            fg=Colors.black,
+            bg=Colors.white,
             font=(self.font_type, self.big_font),
             pady=self._pady,
         )

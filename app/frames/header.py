@@ -4,7 +4,7 @@ from tkinter import filedialog as fd
 
 from PIL import Image, ImageTk
 
-from app.__colors__ import light_blue, white
+from app.utils import Colors
 from app.utils import logger
 
 
@@ -15,7 +15,7 @@ class Header(Frame):
         self.width = width
         self.height = height
         self.pack()
-        self.config(bg=white, width=self.width, height=self.height)
+        self.config(bg=Colors.white, width=self.width, height=self.height)
         self.create_widgets()
 
     def create_widgets(self):
@@ -28,7 +28,7 @@ class Header(Frame):
         self.logo_imn.grid(row=0, column=0, pady=10)
 
         # set space between images and buttons
-        self.space = Label(self, width=4, bg=white)
+        self.space = Label(self, width=4, bg=Colors.white)
         self.space.grid(row=0, column=1)
 
         # set the buttons to add SIGWX map and .docx files
@@ -36,7 +36,7 @@ class Header(Frame):
         self.buttons.grid(row=0, column=2)
 
         # set space between images and buttons
-        self.space = Label(self, width=4, bg=white)
+        self.space = Label(self, width=4, bg=Colors.white)
         self.space.grid(row=0, column=3)
 
         # set the minae logo
@@ -45,7 +45,7 @@ class Header(Frame):
                 self._image_size(3, height_cut=30)
             )
         )
-        self.logo_minae = Label(self, image=self.minae, bd=0, bg=white)
+        self.logo_minae = Label(self, image=self.minae, bd=0, bg=Colors.white)
         self.logo_minae.grid(row=0, column=4, pady=10)
 
     def get_docx_files(self, dtype="avisos"):
@@ -94,14 +94,14 @@ class Header(Frame):
 
     def _create_buttons(self):
         logger.info("Creating header buttons.")
-        __frame = Frame(self, bg=white)
+        __frame = Frame(self, bg=Colors.white)
 
         # set button: add map
         map_btn = Button(
             __frame,
             text="Agregar Mapa",
-            fg=white,
-            bg=light_blue,
+            fg=Colors.white,
+            bg=Colors.light_blue,
             width=10,
             relief="flat",
             command=self._select_map,
@@ -109,15 +109,15 @@ class Header(Frame):
         map_btn.grid(row=0, column=0)
 
         # set space between buttons
-        space = Label(__frame, width=2, bg=white)
+        space = Label(__frame, width=2, bg=Colors.white)
         space.grid(row=1, column=0)
 
         # set button: add docx
         docx_btn = Button(
             __frame,
             text="Agregar .docx",
-            fg=white,
-            bg=light_blue,
+            fg=Colors.white,
+            bg=Colors.light_blue,
             width=10,
             relief="flat",
             command=self._select_docx_files,

@@ -2,23 +2,23 @@ import re
 from collections import namedtuple
 from tkinter import Entry, Frame, Label, Radiobutton, StringVar
 
-from app.__colors__ import blue, light_blue, white
+from app.utils import app_font as font
+from app.utils import Colors
 from app.utils import logger
 
 User = namedtuple("User", "name lname1 lname2 email abbr value")
 
 USERS = [
     User(
-        "Mónica",
-        "Jiménez",
-        "Murillo",
-        "mjimenez",
-        "MJM",
+        "Gabriela",
+        "Leiva",
+        "Castilla",
+        "mleiva",
+        "GLC",
         "0",
     ),
     User("Priscilla", "Castro", "Víquez", "pcastro", "PCV", "1"),
-    User("Raquel", "Salazar", "Víquez", "rsalazar", "RSV", "2"),
-    User("Kenneth", "Chaves", "Cruz", "kchavesc", "KCC", "3"),
+    User("Kenneth", "Chaves", "Cruz", "kchavesc", "KCC", "2"),
     User("Otro usuario", "", "", "", "", "4"),
 ]
 
@@ -32,7 +32,7 @@ class OtherUser(Frame):
         self.height = height
         self.font_type = font_type
         self.font_size = font_size
-        self.config(bg=white, width=self.width, height=self.height)
+        self.config(bg=Colors.white, width=self.width, height=self.height)
         self.grid(row=1, column=2)
 
         # Create entries
@@ -43,8 +43,8 @@ class OtherUser(Frame):
         self.name_label = Label(
             self,
             text="Nombre",
-            fg=blue,
-            bg=white,
+            fg=Colors.black,
+            bg=Colors.white,
             font=(self.font_type, self.font_size),
             padx=5,
         )
@@ -52,18 +52,18 @@ class OtherUser(Frame):
         self.email_label = Label(
             self,
             text="Email",
-            fg=blue,
-            bg=white,
+            fg=Colors.black,
+            bg=Colors.white,
             font=(self.font_type, self.font_size),
             padx=5,
         )
         self.email_label.grid(row=1, column=0)
         self.name_entry = Entry(
-            self, bg=white, bd=3, width=13, fg=blue, justify="center"
+            self, bg=Colors.white, bd=3, width=13, fg=Colors.black, justify="center"
         )
         self.name_entry.grid(row=0, column=1)
         self.email_entry = Entry(
-            self, bg=white, bd=3, width=13, fg=blue, justify="center"
+            self, bg=Colors.white, bd=3, width=13, fg=Colors.black, justify="center"
         )
         self.email_entry.grid(row=1, column=1)
 
@@ -78,7 +78,7 @@ class SelectUser(Frame):
         master=None,
         width=100,
         height=100,
-        font_type="Verdana",
+        font_type=font,
         big_font=16,
         small_font=14,
     ):
@@ -90,7 +90,7 @@ class SelectUser(Frame):
         self.small_font = small_font
         self._padx = 8
         self._pady = 6
-        self.config(bg=white, width=self.width, height=self.height)
+        self.config(bg=Colors.white, width=self.width, height=self.height)
         self.pack()
 
         logger.info("Creating select user widgets.")
@@ -101,14 +101,14 @@ class SelectUser(Frame):
         self.title = Label(
             self,
             text="SELECCIONE SU USUARIO",
-            fg=blue,
-            bg=white,
+            fg=Colors.black,
+            bg=Colors.white,
             font=(self.font_type, self.big_font),
             pady=self._pady + 10,
         )
         self.title.pack()
 
-        self.data = Frame(self, bg=white)
+        self.data = Frame(self, bg=Colors.white)
 
         # Create radio buttons
         self._radio_buttons()
@@ -132,8 +132,8 @@ class SelectUser(Frame):
                 text=f"{user.name} {user.lname1}",
                 variable=self.rbtn_value,
                 value=user.value,
-                bg=white,
-                fg=light_blue,
+                bg=Colors.white,
+                fg=Colors.light_blue,
                 font=(self.font_type, self.small_font),
                 highlightthickness=0,
                 padx=self._padx,

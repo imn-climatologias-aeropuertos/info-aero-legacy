@@ -1,6 +1,6 @@
 from tkinter import Entry, Frame, Label
 
-from app.__colors__ import blue, light_blue, white
+from app.utils import app_font as font, Colors
 from app.utils import logger
 
 
@@ -12,7 +12,7 @@ class Station(Frame):
         name="generic",
         width=100,
         height=10,
-        font_type="Verdana",
+        font_type=font,
         font_size=10,
         padx=8,
         pady=0,
@@ -36,8 +36,8 @@ class Station(Frame):
         Label(
             self.master,
             text=self.name.upper(),
-            fg=light_blue,
-            bg=white,
+            fg=Colors.light_blue,
+            bg=Colors.white,
             font=(self.font_type, self.font_size),
             padx=self._padx,
             pady=self._pady,
@@ -49,10 +49,10 @@ class Station(Frame):
     def _entry(self, column):
         entry = Entry(
             self.master,
-            bg=white,
+            bg=Colors.white,
             bd=3,
             width=5,
-            fg=blue,
+            fg=Colors.black,
             # relief="flat",
             justify="center",
         )
@@ -70,7 +70,7 @@ class Climatology(Frame):
         master=None,
         width=100,
         height=100,
-        font_type="Verdana",
+        font_type=font,
         big_font=16,
         small_font=14,
     ):
@@ -83,7 +83,7 @@ class Climatology(Frame):
         self.small_font = small_font
         self._pady = 6
         self._padx = 8
-        self.config(bg=white, width=self.width, height=self.height)
+        self.config(bg=Colors.white, width=self.width, height=self.height)
         self.pack()
 
         logger.info("Creating climatology widgets.")
@@ -91,15 +91,15 @@ class Climatology(Frame):
         self.title = Label(
             self,
             text="CLIMATOLOGÍA DE LOS AEROPUERTOS",
-            fg=blue,
-            bg=white,
+            fg=Colors.black,
+            bg=Colors.white,
             font=(self.font_type, self.big_font),
             pady=self._pady,
         )
         self.title.pack()
 
         # Create stations frame
-        self.data = Frame(self, bg=white)
+        self.data = Frame(self, bg=Colors.white)
 
         # Variables names
         self.labels = []
@@ -153,8 +153,8 @@ class Climatology(Frame):
         lb = Label(
             self.data,
             text=text,
-            fg=light_blue,
-            bg=white,
+            fg=Colors.light_blue,
+            bg=Colors.white,
             font=(self.font_type, self.small_font),
             padx=self._padx,
         )

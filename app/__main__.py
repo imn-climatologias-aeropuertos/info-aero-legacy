@@ -7,10 +7,9 @@ from platform import system
 import img2pdf
 from PIL import ImageFont
 
-from app.__colors__ import light_blue, white
 from app.__version__ import version
 from app.frames import Climatology, Ephemeris, Footer, Header, SelectUser, box
-from app.utils import MONTHS, TODAY, VOLCANOES, date2str, extract, logger
+from app.utils import MONTHS, TODAY, VOLCANOES, date2str, extract, logger, Colors
 from app.utils.create_view import (
     create_clima,
     create_map_img,
@@ -32,7 +31,7 @@ class App(tk.Tk):
             f"{self.win_width}x{self.win_height}+{self.x_position}+{self.y_position}"
         )
         self.resizable(False, False)
-        self.config(bg=white)
+        self.config(bg=Colors.white)
 
         # Set the app icon
         logger.info("Setting the app icon.")
@@ -48,7 +47,7 @@ class App(tk.Tk):
         self.header = Header(master=self, width=self.win_width, height=110)
 
         # self.extract_btn = tk.Button(
-        #     self, text="Extraer", fg=white, bg=light_blue, command=self.extract_images
+        #     self, text="Extraer", fg=Colors.white, bg=light_blue, command=self.extract_images
         # )
         # self.extract_btn.pack()
 
