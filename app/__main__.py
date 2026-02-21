@@ -16,6 +16,7 @@ from app.utils.create_view import (
     create_taf,
     create_trend01,
     create_trend02,
+    create_trend03,
     create_volcanic_ash,
     create_winds,
 )
@@ -151,6 +152,7 @@ class App(tk.Tk):
         try:
             create_trend01("02_trend.png", **data)
             create_trend02("03_trend.png", **data)
+            create_trend03("04_trend.png", **data)
         except IndexError as e:
             box(
                 "error",
@@ -162,7 +164,7 @@ class App(tk.Tk):
         # create volcanic ash forecast views
         logger.info("Creating the volcanic ash views.")
         extract(self.header.docx_files)
-        img_num = 4
+        img_num = 5
         for volcano in VOLCANOES:
             error = create_volcanic_ash(
                 f"0{img_num}_vash.png", name=volcano.name, dir=volcano.dirname, **data
@@ -173,19 +175,19 @@ class App(tk.Tk):
 
         # create TAF view
         logger.info("Creating the TAF view.")
-        error = create_taf("07_taf.png", **data)
+        error = create_taf("08_taf.png", **data)
         if error:
             return
 
         # create winds view
         logger.info("Creating the winds table view.")
-        error = create_winds("08_winds.png", **data)
+        error = create_winds("09_winds.png", **data)
         if error:
             return
 
         # create climatology view
         logger.info("Creating the climatology and ephemeris view.")
-        create_clima("09_clima.png", **data)
+        create_clima("10_clima.png", **data)
 
         # create pdf file
         self._create_pdf()
