@@ -165,16 +165,6 @@ class TrendText:
             r"\s{2,}", ". Tendencia elaborada por: ", self.actualization
         )
 
-    # def _text_from_docx(self):
-    #     self.paragraphs = [
-    #         p.text for p in self.document.paragraphs if not re.match(r"^\s*$", p.text)
-    #     ]
-    #     self.title = self.paragraphs[0].strip()
-    #     self.subtitle = self.paragraphs[1].strip()
-    #     self.valid = self.paragraphs[2].strip()
-    #     self.general = [p.strip() for p in self.paragraphs[3:5]]
-    #     self.aerodromes = [p.strip() for p in self.paragraphs[5:-1]]
-
 
 @view_creator
 def create_trend01(*args, **kwargs):
@@ -223,14 +213,6 @@ def create_trend02(*args, **kwargs):
     _ = _make_text(draw, text.aerodromes[2], y=y_text, color=Colors.light_blue)
     y_text += 75
     pxls = _make_text(draw, text.aerodromes[3], y=y_text)
-    # y_text += pxls + 65
-    # _ = _make_text(draw, text.aerodromes[4], y=y_text, color=Colors.light_blue)
-    # y_text += 75
-    # pxls = _make_text(draw, text.aerodromes[5], y=y_text)
-    # y_text += pxls + 65
-    # _make_text(draw, text.aerodromes[6], y=y_text, color=Colors.light_blue)
-    # y_text += 75
-    # _make_text(draw, text.aerodromes[7], y=y_text)
 
     return "ok"
 
@@ -251,14 +233,6 @@ def create_trend03(*args, **kwargs):
     _ = _make_text(draw, text.actualization, y=400)
 
     y_text = 550
-    # _ = _make_text(draw, text.aerodromes[0], y=y_text, color=Colors.light_blue)
-    # y_text += 75
-    # pxls = _make_text(draw, text.aerodromes[1], y=y_text)
-    # y_text += pxls + 65
-    # _ = _make_text(draw, text.aerodromes[2], y=y_text, color=Colors.light_blue)
-    # y_text += 75
-    # pxls = _make_text(draw, text.aerodromes[3], y=y_text)
-    # y_text += pxls + 65
     _ = _make_text(draw, text.aerodromes[4], y=y_text, color=Colors.light_blue)
     y_text += 75
     pxls = _make_text(draw, text.aerodromes[5], y=y_text)
