@@ -24,8 +24,10 @@ pulse el botón `Abrir` de la ventana de navegación.
 Los archivos de MS Office deben respetar cierto formato debido al espacio limitado con el que se cuenta.
 En el caso del documento de la `Tendencia de Aeropuertos`, cada aeropuerto debe tener su comentario, 
 además del comentario general, ya que se asume que siempre se encontrará y procure que sea lo más corto 
-posible. Si recibe un archivo incompleto y no cuenta con los datos para poder generar alguno de los 
-comentarios, agregue el texto que desee, se recomienda: **No hay datos para este aeropuerto**.
+posible. No hace falta que pegue los párrafos en uno solo, el programa lo hará por usted, de modo que se
+ahorre espacio en las imágenes finales. Si recibe un archivo incompleto y no cuenta con los datos para
+poder generar alguno de los comentarios, agregue el texto que desee, se recomienda:
+**No hay comentarios para este aeropuerto.**.
 
 También, asegúrese de que los documentos disponibles de `Dispersión de Ceniza` cuenten con al menos una
 imagen.
