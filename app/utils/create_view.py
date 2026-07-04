@@ -311,7 +311,7 @@ def create_volcanic_ash(*args, **kwargs):
             else:
                 logger.info("User choose to stop creating report.")
                 return
-    elif len(images) in [4, 7]:
+    elif len(images) in [3, 5]:
         logger.warning(
             f"correct number of images found in images/volcanoes/{dirname}. Two will be pasted."
         )

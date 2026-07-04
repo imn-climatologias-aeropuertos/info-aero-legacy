@@ -18,6 +18,7 @@ beautifulsoup4 = "*"
 bump2version = "*"
 pikepdf = "*"
 tk = "*"
+tcl = "*"
 
 [dev-packages]
 isort = "*"
